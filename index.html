@@ -3,7 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Katy AI — HR Intelligence, Humanised</title>
+<title>Katy AI — HR Intelligence, Humanised | Makoy</title>
+
+<!-- ─── SEO ─────────────────────────────────────── -->
+<meta name="description" content="Katy AI by Makoy brings human-centred AI to HR consulting — covering recruitment, onboarding, engagement and exit. Build the employee lifecycle your people deserve.">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Makoy">
+<link rel="canonical" href="https://makoy.org/">
+
+<!-- ─── Open Graph (LinkedIn / Facebook) ────────── -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://makoy.org/">
+<meta property="og:title" content="Katy AI — HR Intelligence, Humanised | Makoy">
+<meta property="og:description" content="AI-powered HR consulting that covers the full employee lifecycle — recruitment, onboarding, engagement and exit. Human at heart, intelligent by design.">
+<meta property="og:image" content="https://makoy.org/og-image.png">
+<meta property="og:site_name" content="Makoy">
+<meta property="og:locale" content="en_US">
+
+<!-- ─── Twitter Card ─────────────────────────────── -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@makoyhr">
+<meta name="twitter:title" content="Katy AI — HR Intelligence, Humanised">
+<meta name="twitter:description" content="AI-powered HR consulting covering the full employee lifecycle. Human at heart, intelligent by design.">
+<meta name="twitter:image" content="https://makoy.org/og-image.png">
+
+<!-- ─── Schema.org JSON-LD ───────────────────────── -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://makoy.org/#organization",
+      "name": "Makoy",
+      "url": "https://makoy.org",
+      "logo": "https://makoy.org/og-image.png",
+      "email": "team@makoy.org",
+      "description": "Makoy delivers AI-powered HR intelligence — covering recruitment, onboarding, engagement, and exit — through its product Katy AI.",
+      "sameAs": [
+        "https://www.linkedin.com/company/makoyhr",
+        "https://www.instagram.com/makoyhr"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://makoy.org/#website",
+      "url": "https://makoy.org",
+      "name": "Makoy — Katy AI",
+      "publisher": { "@id": "https://makoy.org/#organization" }
+    },
+    {
+      "@type": "Service",
+      "name": "Katy AI HR Consulting",
+      "provider": { "@id": "https://makoy.org/#organization" },
+      "serviceType": "HR Consulting",
+      "description": "End-to-end AI-assisted HR consulting covering the full employee lifecycle: recruit, onboard, engage, and exit.",
+      "areaServed": "Worldwide",
+      "audience": {
+        "@type": "BusinessAudience",
+        "audienceType": "HR Directors, People Leaders, Founders"
+      }
+    }
+  ]
+}
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
@@ -1144,10 +1208,85 @@
     transform: translateY(0);
   }
 
-  /* ─── MOBILE ─────────────────────────────────── */
+  /* ─── HAMBURGER BUTTON ───────────────────────── */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 36px; height: 36px;
+    background: none; border: none; cursor: pointer;
+    padding: 4px;
+    z-index: 200;
+  }
+
+  .hamburger span {
+    display: block;
+    width: 22px; height: 2px;
+    background: var(--warm-brown);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    transform-origin: center;
+  }
+
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* ─── MOBILE MENU OVERLAY ────────────────────── */
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(247,242,234,0.97);
+    backdrop-filter: blur(20px);
+    z-index: 150;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .mobile-menu.open {
+    display: flex;
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .mobile-menu a {
+    display: block;
+    font-family: 'Lora', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--warm-brown);
+    text-decoration: none;
+    padding: 1rem 2rem;
+    letter-spacing: -0.01em;
+    transition: color 0.2s;
+    text-align: center;
+  }
+
+  .mobile-menu a:hover { color: var(--terracotta); }
+
+  .mobile-menu .mobile-cta {
+    margin-top: 1.5rem;
+    background: var(--terracotta);
+    color: white !important;
+    padding: 0.9rem 2.5rem;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  /* ─── MOBILE (≤900px) ────────────────────────── */
   @media (max-width: 900px) {
     nav { padding: 1rem 1.5rem; }
     .nav-links { display: none; }
+    .hamburger { display: flex; }
     section { padding: 4rem 1.5rem; }
     #hero { padding: 7rem 1.5rem 4rem; }
     .hero-visual { display: none; }
@@ -1156,13 +1295,37 @@
     .sol-card.featured { grid-column: span 1; }
     .process-steps { grid-template-columns: 1fr; gap: 2rem; }
     .process-steps::before { display: none; }
-    .resources-preview { grid-template-columns: 1fr; }
+    .resources-preview { grid-template-columns: repeat(2, 1fr); }
     .form-grid { grid-template-columns: 1fr; }
     .form-group.full { grid-column: span 1; }
     .consult-form-wrap { padding: 1.5rem; }
     .footer-inner { flex-direction: column; text-align: center; }
-    .mission-values { grid-template-columns: 1fr; }
+    .mission-values { grid-template-columns: repeat(2, 1fr); }
     .gate-input-row { flex-direction: column; }
+  }
+
+  /* ─── TABLET (≤768px) ────────────────────────── */
+  @media (max-width: 768px) {
+    .resources-preview { grid-template-columns: 1fr; }
+    .mission-values { grid-template-columns: 1fr; }
+    .otp-inputs { gap: 0.4rem; }
+    .otp-inputs input { width: 44px; height: 52px; font-size: 1.3rem; }
+    .consult-form-wrap { padding: 1.2rem 1rem; }
+  }
+
+  /* ─── SMALL PHONE (≤480px) ───────────────────── */
+  @media (max-width: 480px) {
+    nav { padding: 0.85rem 1.2rem; }
+    .nav-logo { font-size: 1.25rem; }
+    .nav-makoy-badge { display: none; }
+    section { padding: 3rem 1.2rem; }
+    #hero { padding: 6rem 1.2rem 3rem; }
+    .hero-content h1 { font-size: clamp(2rem, 8vw, 2.8rem); }
+    .section-title { font-size: clamp(1.5rem, 6vw, 2rem); }
+    .otp-inputs input { width: 38px; height: 46px; font-size: 1.1rem; }
+    .gate-box { padding: 1.5rem 1rem; }
+    .mobile-menu a { font-size: 1.35rem; }
+    .btn-primary, .btn-secondary { padding: 0.75rem 1.4rem; font-size: 0.9rem; }
   }
 
   /* ─── SUCCESS STATE ──────────────────────────── */
@@ -1253,7 +1416,19 @@
     <li><a href="#resources">Resources</a></li>
     <li><a href="#consult" class="nav-cta">Book a Call</a></li>
   </ul>
+  <button class="hamburger" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<!-- ─── MOBILE MENU ──────────────────────────────── -->
+<div class="mobile-menu" id="mobile-menu" role="dialog" aria-label="Navigation menu">
+  <a href="#mission"   onclick="closeMobileMenu()">Our Vision</a>
+  <a href="#solutions" onclick="closeMobileMenu()">Solutions</a>
+  <a href="#process"   onclick="closeMobileMenu()">How It Works</a>
+  <a href="#resources" onclick="closeMobileMenu()">Resources</a>
+  <a href="#consult"   onclick="closeMobileMenu()" class="mobile-cta">Book a Call</a>
+</div>
 
 <!-- ─── HERO ─────────────────────────────────────── -->
 <section id="hero">
@@ -1605,7 +1780,7 @@
               <input class="otp-digit" maxlength="1" id="d6" oninput="checkOtp()" onkeydown="moveBack(event,'d6','d5')">
             </div>
             <button class="gate-btn" style="width:100%;margin-top:0.4rem;" onclick="verifyOtp()">Verify & Unlock</button>
-            <div class="gate-note" style="margin-top:0.8rem;">Didn't get it? <span class="resend-link" onclick="resendOtp()">Resend code</span> · <span class="resend-link" onclick="backToEmail()">Change email</span></div>
+            <div class="gate-note" style="margin-top:0.8rem;">Didn't get it? <span id="resend-btn" class="resend-link" onclick="resendOtp()">Resend code</span> · <span class="resend-link" onclick="backToEmail()">Change email</span></div>
           </div>
 
         </div>
@@ -1628,50 +1803,50 @@
       <div id="consult-form">
         <div class="form-grid">
           <div class="form-group">
-            <label class="form-label">First Name</label>
-            <input class="form-input" type="text" placeholder="Jane">
+            <label class="form-label" for="f-fname">First Name</label>
+            <input id="f-fname" class="form-input" type="text" placeholder="Jane" required autocomplete="given-name">
           </div>
           <div class="form-group">
-            <label class="form-label">Last Name</label>
-            <input class="form-input" type="text" placeholder="Smith">
+            <label class="form-label" for="f-lname">Last Name</label>
+            <input id="f-lname" class="form-input" type="text" placeholder="Smith" autocomplete="family-name">
           </div>
           <div class="form-group">
-            <label class="form-label">Work Email</label>
-            <input class="form-input" type="email" placeholder="jane@company.com">
+            <label class="form-label" for="f-email">Work Email</label>
+            <input id="f-email" class="form-input" type="email" placeholder="jane@company.com" required autocomplete="email">
           </div>
           <div class="form-group">
-            <label class="form-label">Company Name</label>
-            <input class="form-input" type="text" placeholder="Acme Corp">
+            <label class="form-label" for="f-company">Company Name</label>
+            <input id="f-company" class="form-input" type="text" placeholder="Acme Corp" required autocomplete="organization">
           </div>
           <div class="form-group">
-            <label class="form-label">Company Size</label>
-            <select class="form-select">
+            <label class="form-label" for="f-size">Company Size</label>
+            <select id="f-size" class="form-select" required>
               <option value="">Select...</option>
-              <option>1–10 people</option>
-              <option>11–50 people</option>
-              <option>51–200 people</option>
-              <option>201–500 people</option>
-              <option>500+ people</option>
+              <option value="1-10">1–10 people</option>
+              <option value="11-50">11–50 people</option>
+              <option value="51-200">51–200 people</option>
+              <option value="201-500">201–500 people</option>
+              <option value="500+">500+ people</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">Biggest HR Challenge</label>
-            <select class="form-select">
+            <label class="form-label" for="f-challenge">Biggest HR Challenge</label>
+            <select id="f-challenge" class="form-select" required>
               <option value="">Select...</option>
-              <option>Recruitment & Hiring</option>
-              <option>Onboarding Experience</option>
-              <option>Employee Development</option>
-              <option>Retention & Engagement</option>
-              <option>Exit & Offboarding</option>
-              <option>Everything — we need a full audit</option>
+              <option value="Recruitment & Hiring">Recruitment &amp; Hiring</option>
+              <option value="Onboarding Experience">Onboarding Experience</option>
+              <option value="Employee Development">Employee Development</option>
+              <option value="Retention & Engagement">Retention &amp; Engagement</option>
+              <option value="Exit & Offboarding">Exit &amp; Offboarding</option>
+              <option value="Full Audit">Everything — we need a full audit</option>
             </select>
           </div>
           <div class="form-group full">
-            <label class="form-label">Tell us more (optional)</label>
-            <textarea class="form-textarea" placeholder="Describe your situation — the messier the better, that's exactly what we're here for."></textarea>
+            <label class="form-label" for="f-message">Tell us more (optional)</label>
+            <textarea id="f-message" class="form-textarea" placeholder="Describe your situation — the messier the better, that's exactly what we're here for."></textarea>
           </div>
         </div>
-        <button class="form-submit" onclick="submitConsult()">
+        <button id="consult-submit-btn" class="form-submit" onclick="submitConsult()">
           Book My Free 30-Minute Call →
         </button>
         <p class="form-privacy">🔒 Your details are kept private. No spam, ever.</p>
@@ -1747,15 +1922,15 @@
 <script>
   // ── Scroll reveal ──
   const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
+  const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach((e, i) => {
       if (e.isIntersecting) {
         setTimeout(() => e.target.classList.add('visible'), i * 80);
-        observer.unobserve(e.target);
+        revealObserver.unobserve(e.target);
       }
     });
   }, { threshold: 0.12 });
-  reveals.forEach(r => observer.observe(r));
+  reveals.forEach(r => revealObserver.observe(r));
 
   // ── Nav shadow on scroll ──
   window.addEventListener('scroll', () => {
@@ -1763,79 +1938,112 @@
       window.scrollY > 20 ? '0 2px 20px rgba(61,43,31,0.1)' : 'none';
   });
 
+  // ── Hamburger / mobile menu ──
+  const hamburgerBtn = document.getElementById('hamburger-btn');
+  const mobileMenu   = document.getElementById('mobile-menu');
+
+  function toggleMobileMenu() {
+    const isOpen = mobileMenu.classList.toggle('open');
+    hamburgerBtn.classList.toggle('open', isOpen);
+    hamburgerBtn.setAttribute('aria-expanded', isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  }
+
+  function closeMobileMenu() {
+    mobileMenu.classList.remove('open');
+    hamburgerBtn.classList.remove('open');
+    hamburgerBtn.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+
+  hamburgerBtn.addEventListener('click', toggleMobileMenu);
+
+  // Close menu if user clicks backdrop (outside the links)
+  mobileMenu.addEventListener('click', (e) => {
+    if (e.target === mobileMenu) closeMobileMenu();
+  });
+
   // ── Journey filter ──
   function filterSolutions(stage) {
     document.querySelectorAll('.journey-stop').forEach(el => el.classList.remove('active'));
     event.target.classList.add('active');
-
     document.querySelectorAll('.sol-card').forEach(card => {
       const cardStage = card.getAttribute('data-stage');
-      if (stage === 'all' || cardStage === stage || cardStage === 'all') {
-        card.style.display = '';
-        card.style.opacity = '1';
-      } else {
-        card.style.opacity = '0.2';
-        card.style.pointerEvents = 'none';
-        // Restore after transition
-        setTimeout(() => {
-          if (stage !== 'all' && cardStage !== stage && cardStage !== 'all') {
-            card.style.display = '';
-          }
-        }, 300);
-      }
+      const visible = stage === 'all' || cardStage === stage || cardStage === 'all';
+      card.style.opacity = visible ? '1' : '0.2';
+      card.style.pointerEvents = visible ? '' : 'none';
     });
-
-    // Restore pointer events for non-filtered
-    setTimeout(() => {
-      document.querySelectorAll('.sol-card').forEach(card => {
-        if (parseFloat(card.style.opacity) > 0.5) card.style.pointerEvents = '';
-      });
-    }, 300);
   }
 
   // ── Toast helper ──
-  function showToast(msg) {
+  function showToast(msg, type) {
     const t = document.getElementById('toast');
     document.getElementById('toast-msg').textContent = msg;
+    t.style.background = type === 'error' ? '#c0392b' : '';
     t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3500);
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.classList.remove('show'); t.style.background = ''; }, 3500);
   }
 
-  // ── Resources gate ──
-  let verifiedEmails = JSON.parse(localStorage.getItem('katyai_verified') || '[]');
-  let currentEmail = '';
-  let generatedOtp = '';
+  // ── Button loading state helpers ──
+  function setLoading(btn, loading, label) {
+    btn.disabled = loading;
+    btn.textContent = loading ? 'Sending…' : label;
+    btn.style.opacity = loading ? '0.7' : '';
+  }
 
-  function requestOtp() {
+  // ─────────────────────────────────────────────────
+  // ── Resources gate — connected to backend API ──
+  // ─────────────────────────────────────────────────
+  const verifiedEmails = JSON.parse(localStorage.getItem('katyai_verified') || '[]');
+  let currentEmail = '';
+
+  async function requestOtp() {
     const email = document.getElementById('gate-email').value.trim();
-    if (!email || !email.includes('@')) {
-      showToast('Please enter a valid email address');
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRe.test(email)) {
+      showToast('Please enter a valid email address', 'error');
       return;
     }
 
     currentEmail = email;
 
-    // Check if already verified
     if (verifiedEmails.includes(email)) {
       unlockResources();
       return;
     }
 
-    // Generate mock OTP (in production, this would call your backend)
-    generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log('[DEV] OTP for ' + email + ': ' + generatedOtp); // Remove in production
-
-    document.getElementById('otp-sent-to').textContent = `We sent a 6-digit code to ${email}`;
-    document.getElementById('gate-step-email').style.display = 'none';
-    document.getElementById('gate-step-otp').style.display = 'block';
-    showToast(`Code sent to ${email}! (Check console in dev mode)`);
+    const btn = document.querySelector('#gate-step-email .gate-btn');
+    setLoading(btn, true, 'Send Code');
+    try {
+      const res = await fetch('/api/otp/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById('otp-sent-to').textContent = `We sent a 6-digit code to ${email}`;
+        document.getElementById('gate-step-email').style.display = 'none';
+        document.getElementById('gate-step-otp').style.display = 'block';
+        document.getElementById('d1').focus();
+        showToast(`Code sent to ${email} — check your inbox`);
+      } else {
+        showToast(data.error || 'Could not send code. Please try again.', 'error');
+      }
+    } catch {
+      showToast('Network error — please check your connection', 'error');
+    } finally {
+      setLoading(btn, false, 'Send Code');
+    }
   }
 
   function moveNext(current, nextId) {
-    if (current.value.length === 1) {
+    if (current.value.length === 1 && nextId) {
       const next = document.getElementById(nextId);
       if (next) next.focus();
     }
+    checkOtp();
   }
 
   function moveBack(e, currentId, prevId) {
@@ -1853,34 +2061,64 @@
     if (getEnteredOtp().length === 6) verifyOtp();
   }
 
-  function verifyOtp() {
-    const entered = getEnteredOtp();
-    if (entered === generatedOtp) {
-      verifiedEmails.push(currentEmail);
-      localStorage.setItem('katyai_verified', JSON.stringify(verifiedEmails));
-      unlockResources();
-    } else {
-      showToast('Incorrect code — please try again');
-      ['d1','d2','d3','d4','d5','d6'].forEach(id => {
-        const el = document.getElementById(id);
-        el.value = '';
-        el.style.borderColor = '#e05555';
-        setTimeout(() => el.style.borderColor = '', 1200);
+  async function verifyOtp() {
+    const otp = getEnteredOtp();
+    if (otp.length < 6) return;
+
+    const btn = document.querySelector('#gate-step-otp .gate-btn');
+    const origLabel = 'Verify & Unlock';
+    setLoading(btn, true, origLabel);
+    try {
+      const res = await fetch('/api/otp/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: currentEmail, otp })
       });
-      document.getElementById('d1').focus();
+      const data = await res.json();
+      if (res.ok) {
+        verifiedEmails.push(currentEmail);
+        localStorage.setItem('katyai_verified', JSON.stringify(verifiedEmails));
+        unlockResources();
+      } else {
+        showToast(data.error || 'Incorrect code — please try again', 'error');
+        ['d1','d2','d3','d4','d5','d6'].forEach(id => {
+          const el = document.getElementById(id);
+          el.value = '';
+          el.style.borderColor = '#e05555';
+          setTimeout(() => el.style.borderColor = '', 1400);
+        });
+        document.getElementById('d1').focus();
+      }
+    } catch {
+      showToast('Network error — please try again', 'error');
+    } finally {
+      setLoading(btn, false, origLabel);
     }
   }
 
   function unlockResources() {
     document.getElementById('gate-overlay').style.display = 'none';
     document.getElementById('resources-preview').classList.add('unlocked');
-    showToast('🎉 Resources unlocked! Enjoy.');
+    showToast('Resources unlocked — enjoy!');
   }
 
-  function resendOtp() {
-    generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log('[DEV] New OTP: ' + generatedOtp);
-    showToast(`New code sent to ${currentEmail}`);
+  async function resendOtp() {
+    const btn = document.getElementById('resend-btn');
+    if (btn) { btn.style.pointerEvents = 'none'; btn.textContent = 'Sending…'; }
+    try {
+      await fetch('/api/otp/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: currentEmail })
+      });
+      showToast(`New code sent to ${currentEmail}`);
+    } catch {
+      showToast('Could not resend — please try again', 'error');
+    } finally {
+      if (btn) {
+        setTimeout(() => { btn.style.pointerEvents = ''; btn.textContent = 'Resend code'; }, 30000);
+      }
+    }
   }
 
   function backToEmail() {
@@ -1888,17 +2126,65 @@
     document.getElementById('gate-step-email').style.display = 'block';
   }
 
-  // ── Consultation form ──
-  function submitConsult() {
-    document.getElementById('consult-form').style.display = 'none';
-    document.getElementById('consult-success').style.display = 'block';
-    showToast('Consultation request sent! We\'ll be in touch soon.');
+  // ─────────────────────────────────────────────────
+  // ── Consultation form — connected to backend ──
+  // ─────────────────────────────────────────────────
+  async function submitConsult() {
+    const get = id => document.getElementById(id);
+
+    const firstName  = get('f-fname')?.value.trim()   || '';
+    const lastName   = get('f-lname')?.value.trim()   || '';
+    const email      = get('f-email')?.value.trim()   || '';
+    const company    = get('f-company')?.value.trim() || '';
+    const size       = get('f-size')?.value           || '';
+    const challenge  = get('f-challenge')?.value      || '';
+    const message    = get('f-message')?.value.trim() || '';
+
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!firstName) { showToast('Please enter your first name', 'error'); get('f-fname')?.focus(); return; }
+    if (!emailRe.test(email)) { showToast('Please enter a valid email address', 'error'); get('f-email')?.focus(); return; }
+    if (!company)  { showToast('Please enter your company name', 'error'); get('f-company')?.focus(); return; }
+    if (!size)     { showToast('Please select your company size', 'error'); get('f-size')?.focus(); return; }
+    if (!challenge){ showToast('Please select your primary HR challenge', 'error'); get('f-challenge')?.focus(); return; }
+
+    const btn = document.getElementById('consult-submit-btn');
+    const origLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+    btn.style.opacity = '0.7';
+
+    try {
+      const res = await fetch('/api/consultation/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstName, lastName, email, company, companySize: size, hrChallenge: challenge, message })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById('consult-form').style.display = 'none';
+        document.getElementById('consult-success').style.display = 'block';
+        showToast('Consultation request sent! We\'ll be in touch soon.');
+      } else {
+        showToast(data.error || 'Could not submit — please try again', 'error');
+      }
+    } catch {
+      showToast('Network error — please check your connection', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = origLabel;
+      btn.style.opacity = '';
+    }
   }
 
-  // ── Check already verified on load ──
+  // ── Auto-unlock on load if already verified ──
   window.addEventListener('DOMContentLoaded', () => {
-    // If email already verified in a previous session, auto-unlock
-    // (For demo: we don't auto-unlock, users can enter their email)
+    if (verifiedEmails.length > 0) {
+      const overlay = document.getElementById('gate-overlay');
+      if (overlay) overlay.style.display = 'none';
+      const preview = document.getElementById('resources-preview');
+      if (preview) preview.classList.add('unlocked');
+    }
   });
 </script>
 

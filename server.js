@@ -2,12 +2,13 @@
 
 require('dotenv').config();
 
-const express    = require('express');
-const nodemailer = require('nodemailer');
-const crypto     = require('crypto');
-const cors       = require('cors');
-const rateLimit  = require('express-rate-limit');
-const path       = require('path');
+const express     = require('express');
+const nodemailer  = require('nodemailer');
+const crypto      = require('crypto');
+const cors        = require('cors');
+const compression = require('compression');
+const rateLimit   = require('express-rate-limit');
+const path        = require('path');
 const { initDb, upsertEmailCapture, markEmailVerified, upsertConsultation, markOptedOut } = require('./db');
 
 const app  = express();
@@ -22,6 +23,7 @@ const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toSt
 const OTP_KEY = crypto.createHash('sha256').update('otp:' + SESSION_SECRET).digest();
 
 // ─── Middleware ────────────────────────────────────────────
+app.use(compression());
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: false, limit: '10kb' }));
 

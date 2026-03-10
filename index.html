@@ -1170,7 +1170,7 @@
   }
 
   .footer-socials {
-    display: flex; gap: 1rem;
+    display: none; gap: 1rem;
   }
 
   .social-link {
@@ -1688,19 +1688,19 @@
             <span class="res-type-badge badge-template">📄 Template</span>
             <div class="res-title">Job Description Builder Framework</div>
             <div class="res-desc">A structured template for writing inclusive, clear JDs that attract the right talent.</div>
-            <a class="res-download" href="#">Download <span>→</span></a>
+            <a class="res-download" href="#" onclick="showToast('Resource coming soon — check back shortly!');return false;">Download <span>→</span></a>
           </div>
           <div class="res-card">
             <span class="res-type-badge badge-checklist">✅ Checklist</span>
             <div class="res-title">Interview Bias Reduction Checklist</div>
             <div class="res-desc">20-point checklist to keep your hiring process fair and structured.</div>
-            <a class="res-download" href="#">Download <span>→</span></a>
+            <a class="res-download" href="#" onclick="showToast('Resource coming soon — check back shortly!');return false;">Download <span>→</span></a>
           </div>
           <div class="res-card">
             <span class="res-type-badge badge-guide">📖 Guide</span>
             <div class="res-title">The Modern Recruiter's Playbook</div>
             <div class="res-desc">10-page guide to AI-assisted sourcing, screening, and selection in 2025.</div>
-            <a class="res-download" href="#">Download <span>→</span></a>
+            <a class="res-download" href="#" onclick="showToast('Resource coming soon — check back shortly!');return false;">Download <span>→</span></a>
           </div>
         </div>
 
@@ -1710,19 +1710,19 @@
             <span class="res-type-badge badge-template">📄 Template</span>
             <div class="res-title">30-60-90 Day Onboarding Plan</div>
             <div class="res-desc">Editable milestone plan for managers and new hires to align expectations.</div>
-            <a class="res-download" href="#">Download <span>→</span></a>
+            <a class="res-download" href="#" onclick="showToast('Resource coming soon — check back shortly!');return false;">Download <span>→</span></a>
           </div>
           <div class="res-card">
             <span class="res-type-badge badge-guide">📖 Guide</span>
             <div class="res-title">Building a Learning Culture</div>
             <div class="res-desc">How to design L&D programmes that employees actually engage with.</div>
-            <a class="res-download" href="#">Download <span>→</span></a>
+            <a class="res-download" href="#" onclick="showToast('Resource coming soon — check back shortly!');return false;">Download <span>→</span></a>
           </div>
           <div class="res-card">
             <span class="res-type-badge badge-checklist">✅ Checklist</span>
             <div class="res-title">New Hire Week 1 Checklist</div>
             <div class="res-desc">Everything HR and the hiring manager need to ensure a smooth first week.</div>
-            <a class="res-download" href="#">Download <span>→</span></a>
+            <a class="res-download" href="#" onclick="showToast('Resource coming soon — check back shortly!');return false;">Download <span>→</span></a>
           </div>
         </div>
 
@@ -1732,19 +1732,19 @@
             <span class="res-type-badge badge-template">📄 Template</span>
             <div class="res-title">Exit Interview Question Bank</div>
             <div class="res-desc">50 structured questions to uncover real reasons for attrition.</div>
-            <a class="res-download" href="#">Download <span>→</span></a>
+            <a class="res-download" href="#" onclick="showToast('Resource coming soon — check back shortly!');return false;">Download <span>→</span></a>
           </div>
           <div class="res-card">
             <span class="res-type-badge badge-case">📊 Case Study</span>
             <div class="res-title">Reducing Turnover with Feedback Loops</div>
             <div class="res-desc">How one team reduced 6-month attrition by 34% through structured check-ins.</div>
-            <a class="res-download" href="#">Read More <span>→</span></a>
+            <a class="res-download" href="#" onclick="showToast('Resource coming soon — check back shortly!');return false;">Read More <span>→</span></a>
           </div>
           <div class="res-card">
             <span class="res-type-badge badge-guide">📖 Guide</span>
             <div class="res-title">Employee Pulse Survey Design Guide</div>
             <div class="res-desc">Best practices for running surveys that surface honest, actionable feedback.</div>
-            <a class="res-download" href="#">Download <span>→</span></a>
+            <a class="res-download" href="#" onclick="showToast('Resource coming soon — check back shortly!');return false;">Download <span>→</span></a>
           </div>
         </div>
 
@@ -1772,12 +1772,12 @@
             <div class="gate-title">Check your inbox</div>
             <div class="gate-sub" id="otp-sent-to">We sent a 6-digit code to your email.</div>
             <div class="otp-inputs">
-              <input class="otp-digit" maxlength="1" id="d1" oninput="moveNext(this,'d2')" onkeydown="moveBack(event,'d1','d1')">
-              <input class="otp-digit" maxlength="1" id="d2" oninput="moveNext(this,'d3')" onkeydown="moveBack(event,'d2','d1')">
-              <input class="otp-digit" maxlength="1" id="d3" oninput="moveNext(this,'d4')" onkeydown="moveBack(event,'d3','d2')">
-              <input class="otp-digit" maxlength="1" id="d4" oninput="moveNext(this,'d5')" onkeydown="moveBack(event,'d4','d3')">
-              <input class="otp-digit" maxlength="1" id="d5" oninput="moveNext(this,'d6')" onkeydown="moveBack(event,'d5','d4')">
-              <input class="otp-digit" maxlength="1" id="d6" oninput="checkOtp()" onkeydown="moveBack(event,'d6','d5')">
+              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" id="d1" oninput="moveNext(this,'d2')" onkeydown="moveBack(event,'d1','d1')">
+              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" id="d2" oninput="moveNext(this,'d3')" onkeydown="moveBack(event,'d2','d1')">
+              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" id="d3" oninput="moveNext(this,'d4')" onkeydown="moveBack(event,'d3','d2')">
+              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" id="d4" oninput="moveNext(this,'d5')" onkeydown="moveBack(event,'d4','d3')">
+              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" id="d5" oninput="moveNext(this,'d6')" onkeydown="moveBack(event,'d5','d4')">
+              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" id="d6" oninput="checkOtp()" onkeydown="moveBack(event,'d6','d5')">
             </div>
             <button class="gate-btn" style="width:100%;margin-top:0.4rem;" onclick="verifyOtp()">Verify & Unlock</button>
             <div class="gate-note" style="margin-top:0.8rem;">Didn't get it? <span id="resend-btn" class="resend-link" onclick="resendOtp()">Resend code</span> · <span class="resend-link" onclick="backToEmail()">Change email</span></div>
@@ -2007,7 +2007,7 @@
   }
 
   async function requestOtp() {
-    const email = document.getElementById('gate-email').value.trim();
+    const email = document.getElementById('gate-email').value.trim().toLowerCase();
     const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRe.test(email)) {
       showToast('Please enter a valid email address', 'error');
@@ -2136,7 +2136,7 @@
 
     const firstName  = get('f-fname')?.value.trim()   || '';
     const lastName   = get('f-lname')?.value.trim()   || '';
-    const email      = get('f-email')?.value.trim()   || '';
+    const email      = get('f-email')?.value.trim().toLowerCase()   || '';
     const company    = get('f-company')?.value.trim() || '';
     const size       = get('f-size')?.value           || '';
     const challenge  = get('f-challenge')?.value      || '';

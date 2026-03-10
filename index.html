@@ -1995,8 +1995,16 @@
   // ─────────────────────────────────────────────────
   // ── Resources gate — connected to backend API ──
   // ─────────────────────────────────────────────────
-  const verifiedEmails = JSON.parse(localStorage.getItem('katyai_verified') || '[]');
+  let csrfToken = '';
   let currentEmail = '';
+
+  async function fetchCsrfToken() {
+    try {
+      const res = await fetch('/api/csrf-token');
+      const data = await res.json();
+      csrfToken = data.token || '';
+    } catch { csrfToken = ''; }
+  }
 
   async function requestOtp() {
     const email = document.getElementById('gate-email').value.trim();
@@ -2008,17 +2016,12 @@
 
     currentEmail = email;
 
-    if (verifiedEmails.includes(email)) {
-      unlockResources();
-      return;
-    }
-
     const btn = document.querySelector('#gate-step-email .gate-btn');
     setLoading(btn, true, 'Send Code');
     try {
       const res = await fetch('/api/otp/request', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
         body: JSON.stringify({ email })
       });
       const data = await res.json();
@@ -2071,13 +2074,12 @@
     try {
       const res = await fetch('/api/otp/verify', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
         body: JSON.stringify({ email: currentEmail, otp })
       });
       const data = await res.json();
       if (res.ok) {
-        verifiedEmails.push(currentEmail);
-        localStorage.setItem('katyai_verified', JSON.stringify(verifiedEmails));
+        if (data.token) localStorage.setItem('katyai_vtoken', data.token);
         unlockResources();
       } else {
         showToast(data.error || 'Incorrect code — please try again', 'error');
@@ -2108,7 +2110,7 @@
     try {
       await fetch('/api/otp/request', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
         body: JSON.stringify({ email: currentEmail })
       });
       showToast(`New code sent to ${currentEmail}`);
@@ -2157,7 +2159,7 @@
     try {
       const res = await fetch('/api/consultation/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
         body: JSON.stringify({ firstName, lastName, email, company, companySize: size, hrChallenge: challenge, message })
       });
       const data = await res.json();
@@ -2177,14 +2179,28 @@
     }
   }
 
-  // ── Auto-unlock on load if already verified ──
-  window.addEventListener('DOMContentLoaded', () => {
-    if (verifiedEmails.length > 0) {
-      const overlay = document.getElementById('gate-overlay');
-      if (overlay) overlay.style.display = 'none';
-      const preview = document.getElementById('resources-preview');
-      if (preview) preview.classList.add('unlocked');
-    }
+  // ── Auto-unlock on load — validate server-signed token ──
+  window.addEventListener('DOMContentLoaded', async () => {
+    await fetchCsrfToken();
+    const vtoken = localStorage.getItem('katyai_vtoken');
+    if (!vtoken) return;
+    // Optimistically hide gate to prevent flash, then validate server-side
+    const overlay = document.getElementById('gate-overlay');
+    const preview = document.getElementById('resources-preview');
+    if (overlay) overlay.style.display = 'none';
+    if (preview) preview.classList.add('unlocked');
+    try {
+      const res = await fetch('/api/otp/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        body: JSON.stringify({ token: vtoken })
+      });
+      if (!res.ok) {
+        localStorage.removeItem('katyai_vtoken');
+        if (overlay) overlay.style.display = '';
+        if (preview) preview.classList.remove('unlocked');
+      }
+    } catch { /* network error — keep unlocked, token is cryptographically signed */ }
   });
 </script>
 

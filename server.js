@@ -8,19 +8,38 @@ const crypto     = require('crypto');
 const cors       = require('cors');
 const rateLimit  = require('express-rate-limit');
 const path       = require('path');
-const { initDb, upsertEmailCapture, markEmailVerified, upsertConsultation } = require('./db');
+const { initDb, upsertEmailCapture, markEmailVerified, upsertConsultation, markOptedOut } = require('./db');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
+
+// ─── Secrets ───────────────────────────────────────────────
+// SESSION_SECRET must be set in production; a random one is generated
+// per process restart in development (invalidates all tokens on restart).
+const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
+
+// Derive a 32-byte key for AES-256-GCM OTP encryption
+const OTP_KEY = crypto.createHash('sha256').update('otp:' + SESSION_SECRET).digest();
 
 // ─── Middleware ────────────────────────────────────────────
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: false, limit: '10kb' }));
 
+// CORS — only allow the configured frontend origin
+const allowedOrigins = process.env.FRONTEND_URL
+  ? [process.env.FRONTEND_URL]
+  : (process.env.NODE_ENV === 'production'
+      ? [] // Disallow all if unconfigured in production
+      : ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000']);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || true,
+  origin: (origin, callback) => {
+    // Allow same-origin (no origin header) and configured origins
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error('Not allowed by CORS'));
+  },
   methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type']
+  allowedHeaders: ['Content-Type', 'X-CSRF-Token']
 }));
 
 // Serve frontend static files
@@ -47,8 +66,100 @@ const consultLimiter = rateLimit({
   message: { error: 'Too many requests. Please try again later.' }
 });
 
+// ─── CSRF Protection ───────────────────────────────────────
+// Time-window HMAC token — valid for 2 windows (~4 hours max).
+// No server-side state needed; can't be forged without SESSION_SECRET.
+const CSRF_WINDOW_MS = 2 * 60 * 60 * 1000; // 2-hour window
+
+function generateCsrfToken() {
+  const w = Math.floor(Date.now() / CSRF_WINDOW_MS);
+  return crypto.createHmac('sha256', SESSION_SECRET).update(`csrf:${w}`).digest('hex');
+}
+
+function isValidCsrfToken(token) {
+  if (typeof token !== 'string' || token.length !== 64) return false;
+  const w = Math.floor(Date.now() / CSRF_WINDOW_MS);
+  for (const offset of [0, -1]) {
+    const expected = crypto.createHmac('sha256', SESSION_SECRET)
+      .update(`csrf:${w + offset}`).digest('hex');
+    if (crypto.timingSafeEqual(Buffer.from(token), Buffer.from(expected))) return true;
+  }
+  return false;
+}
+
+function csrfProtect(req, res, next) {
+  const token = req.headers['x-csrf-token'];
+  if (!isValidCsrfToken(token)) {
+    return res.status(403).json({ error: 'Invalid or missing CSRF token.' });
+  }
+  next();
+}
+
+// ─── OTP Encryption ────────────────────────────────────────
+// AES-256-GCM: OTPs are never stored in plain text in memory.
+
+function encryptOtp(otp) {
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv('aes-256-gcm', OTP_KEY, iv);
+  const encrypted = Buffer.concat([cipher.update(otp, 'utf8'), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  return `${iv.toString('hex')}:${encrypted.toString('hex')}:${tag.toString('hex')}`;
+}
+
+function decryptOtp(stored) {
+  const parts = stored.split(':');
+  if (parts.length !== 3) throw new Error('Invalid OTP format');
+  const [ivHex, dataHex, tagHex] = parts;
+  const iv       = Buffer.from(ivHex,   'hex');
+  const data     = Buffer.from(dataHex, 'hex');
+  const tag      = Buffer.from(tagHex,  'hex');
+  const decipher = crypto.createDecipheriv('aes-256-gcm', OTP_KEY, iv);
+  decipher.setAuthTag(tag);
+  return Buffer.concat([decipher.update(data), decipher.final()]).toString('utf8');
+}
+
+// ─── Verification Token ────────────────────────────────────
+// Issued to the client after successful OTP verification.
+// Format (base64url): email:expires:HMAC — cannot be forged or extended.
+const VERIFY_TOKEN_TTL = 90 * 24 * 60 * 60 * 1000; // 90 days
+
+function generateVerifyToken(email) {
+  const expires = Date.now() + VERIFY_TOKEN_TTL;
+  const payload = `${email.toLowerCase().trim()}:${expires}`;
+  const sig = crypto.createHmac('sha256', SESSION_SECRET).update(payload).digest('hex');
+  return Buffer.from(`${payload}:${sig}`).toString('base64url');
+}
+
+function verifyVerifyToken(token) {
+  try {
+    const decoded = Buffer.from(token, 'base64url').toString('utf8');
+    // sig is the last 64 hex chars; payload is everything before the final ':'
+    const sigStart = decoded.length - 65; // index of ':' before sig
+    if (sigStart < 1) return null;
+    const payload = decoded.slice(0, sigStart);
+    const sig     = decoded.slice(sigStart + 1);
+    if (sig.length !== 64) return null;
+    const expected = crypto.createHmac('sha256', SESSION_SECRET).update(payload).digest('hex');
+    if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null;
+    const colonIdx = payload.lastIndexOf(':');
+    const expires  = parseInt(payload.slice(colonIdx + 1), 10);
+    if (Date.now() > expires) return null;
+    return payload.slice(0, colonIdx); // verified email
+  } catch {
+    return null;
+  }
+}
+
+// ─── Unsubscribe Token ─────────────────────────────────────
+// Deterministic HMAC — no expiry needed (user can always unsubscribe).
+function generateUnsubToken(email) {
+  return crypto.createHmac('sha256', SESSION_SECRET)
+    .update(`unsub:${email.toLowerCase().trim()}`)
+    .digest('hex');
+}
+
 // ─── In-Memory OTP Store ───────────────────────────────────
-// Map<emailLower, { otp, expires, attempts }>
+// Map<emailLower, { encryptedOtp, expires, attempts }>
 const otpStore = new Map();
 
 // Clean expired OTPs every 5 minutes
@@ -69,7 +180,7 @@ const transporter = nodemailer.createTransport({
     pass: process.env.SMTP_PASS || ''
   },
   tls: {
-    rejectUnauthorized: process.env.NODE_ENV === 'production'
+    rejectUnauthorized: true // always enforce TLS certificate validation
   }
 });
 
@@ -89,8 +200,12 @@ const isValidEmail = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 const escHtml      = (s) => String(s)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
+const siteUrl = process.env.FRONTEND_URL || 'https://makoy.org';
+
 // ─── Email Templates ───────────────────────────────────────
-function otpEmailHtml(otp) {
+function otpEmailHtml(otp, email) {
+  const unsubToken = generateUnsubToken(email);
+  const unsubUrl   = `${siteUrl}/api/unsubscribe?email=${encodeURIComponent(email)}&token=${unsubToken}`;
   return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
@@ -112,6 +227,7 @@ function otpEmailHtml(otp) {
     <div style="background:#F7F2EA;padding:20px 40px;text-align:center;border-top:1px solid rgba(61,43,31,0.06);">
       <p style="font-size:12px;color:#9B7B6B;margin:0 0 4px;">&copy; 2025 Makoy &middot; Katy AI</p>
       <p style="font-size:12px;margin:0;"><a href="mailto:team@makoy.org" style="color:#C4724A;text-decoration:none;">team@makoy.org</a></p>
+      <p style="font-size:11px;color:#B0A09A;margin:8px 0 0;"><a href="${unsubUrl}" style="color:#B0A09A;text-decoration:underline;">Unsubscribe</a></p>
     </div>
   </div>
 </body>
@@ -144,7 +260,9 @@ function consultNotificationHtml(d) {
 </body></html>`;
 }
 
-function consultConfirmHtml(firstName, company) {
+function consultConfirmHtml(firstName, company, email) {
+  const unsubToken = generateUnsubToken(email);
+  const unsubUrl   = `${siteUrl}/api/unsubscribe?email=${encodeURIComponent(email)}&token=${unsubToken}`;
   return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
@@ -163,11 +281,12 @@ function consultConfirmHtml(firstName, company) {
         <p style="margin:10px 0 0;font-size:12px;color:#9B7B6B;">— The Katy AI Team</p>
       </div>
       <p style="color:#6B4C3B;font-size:14px;line-height:1.65;margin:0 0 12px;">A member of our team will be in touch within <strong>24 hours</strong> to schedule your free 30-minute discovery call.</p>
-      <p style="color:#6B4C3B;font-size:14px;line-height:1.65;margin:0;">In the meantime, explore our free HR resources at <a href="https://makoy.org/#resources" style="color:#C4724A;text-decoration:none;">makoy.org</a></p>
+      <p style="color:#6B4C3B;font-size:14px;line-height:1.65;margin:0;">In the meantime, explore our free HR resources at <a href="${siteUrl}/#resources" style="color:#C4724A;text-decoration:none;">makoy.org</a></p>
     </div>
     <div style="background:#F7F2EA;padding:20px 40px;text-align:center;border-top:1px solid rgba(61,43,31,0.06);">
       <p style="font-size:12px;color:#9B7B6B;margin:0 0 4px;">&copy; 2025 Makoy &middot; Katy AI</p>
       <p style="font-size:12px;margin:0;"><a href="mailto:team@makoy.org" style="color:#C4724A;text-decoration:none;">team@makoy.org</a></p>
+      <p style="font-size:11px;color:#B0A09A;margin:8px 0 0;"><a href="${unsubUrl}" style="color:#B0A09A;text-decoration:underline;">Unsubscribe</a></p>
     </div>
   </div>
 </body>
@@ -176,13 +295,18 @@ function consultConfirmHtml(firstName, company) {
 
 // ─── API Routes ────────────────────────────────────────────
 
+// CSRF token — fetch on page load, include in all POST requests
+app.get('/api/csrf-token', (_req, res) => {
+  res.json({ token: generateCsrfToken() });
+});
+
 // Health check
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', service: 'Katy AI API', timestamp: new Date().toISOString() });
 });
 
 // Request OTP
-app.post('/api/otp/request', otpRequestLimiter, async (req, res) => {
+app.post('/api/otp/request', otpRequestLimiter, csrfProtect, async (req, res) => {
   const { email } = req.body;
 
   if (!email || !isValidEmail(email)) {
@@ -193,7 +317,8 @@ app.post('/api/otp/request', otpRequestLimiter, async (req, res) => {
   const otp        = generateOtp();
   const expires    = Date.now() + 10 * 60 * 1000; // 10 min
 
-  otpStore.set(emailLower, { otp, expires, attempts: 0 });
+  // Store encrypted OTP — plain-text OTP never persisted
+  otpStore.set(emailLower, { encryptedOtp: encryptOtp(otp), expires, attempts: 0 });
 
   // Capture email in DB (non-blocking, pass through any UTM params)
   upsertEmailCapture(emailLower, {
@@ -207,14 +332,14 @@ app.post('/api/otp/request', otpRequestLimiter, async (req, res) => {
   try {
     await transporter.sendMail({
       from:    `"Katy AI by Makoy" <${process.env.SMTP_USER || 'team@makoy.org'}>`,
-      to:      email,
+      to:      emailLower,
       subject: 'Your Katy AI Resource Access Code',
-      html:    otpEmailHtml(otp),
+      html:    otpEmailHtml(otp, emailLower),
       text:    `Your Katy AI access code is: ${otp}\n\nThis code expires in 10 minutes.\n\nIf you didn't request this, ignore this email.\n\n© 2025 Makoy · team@makoy.org`
     });
 
     console.log(`📧  OTP sent to ${emailLower}`);
-    res.json({ success: true, message: `Verification code sent to ${email}` });
+    res.json({ success: true, message: `Verification code sent to ${emailLower}` });
   } catch (err) {
     console.error('OTP email error:', err.message);
     otpStore.delete(emailLower);
@@ -223,7 +348,7 @@ app.post('/api/otp/request', otpRequestLimiter, async (req, res) => {
 });
 
 // Verify OTP
-app.post('/api/otp/verify', otpVerifyLimiter, (req, res) => {
+app.post('/api/otp/verify', otpVerifyLimiter, csrfProtect, (req, res) => {
   const { email, otp } = req.body;
 
   if (!email || !otp) {
@@ -233,13 +358,10 @@ app.post('/api/otp/verify', otpVerifyLimiter, (req, res) => {
   const emailLower = email.toLowerCase().trim();
   const stored     = otpStore.get(emailLower);
 
-  if (!stored) {
-    return res.status(400).json({ error: 'No active code found for this email. Please request a new one.' });
-  }
-
-  if (Date.now() > stored.expires) {
+  // Generic message — prevents account enumeration
+  if (!stored || Date.now() > stored.expires) {
     otpStore.delete(emailLower);
-    return res.status(400).json({ error: 'Your code has expired. Please request a new one.' });
+    return res.status(400).json({ error: 'Invalid or expired code. Please request a new one.' });
   }
 
   stored.attempts += 1;
@@ -249,22 +371,40 @@ app.post('/api/otp/verify', otpVerifyLimiter, (req, res) => {
     return res.status(400).json({ error: 'Too many incorrect attempts. Please request a new code.' });
   }
 
-  if (stored.otp !== otp.toString().trim()) {
+  let plainOtp;
+  try {
+    plainOtp = decryptOtp(stored.encryptedOtp);
+  } catch {
+    otpStore.delete(emailLower);
+    return res.status(500).json({ error: 'Verification error. Please request a new code.' });
+  }
+
+  if (plainOtp !== otp.toString().trim()) {
     const remaining = 5 - stored.attempts;
     return res.status(400).json({
       error: `Incorrect code. ${remaining > 0 ? `${remaining} attempt${remaining !== 1 ? 's' : ''} remaining.` : 'Please request a new code.'}`
     });
   }
 
-  // Verified!
+  // Verified — issue signed token, clean up OTP
   otpStore.delete(emailLower);
   markEmailVerified(emailLower); // non-blocking DB update
+  const token = generateVerifyToken(emailLower);
   console.log(`✅  OTP verified for ${emailLower}`);
-  res.json({ success: true, message: 'Email verified successfully.' });
+  res.json({ success: true, message: 'Email verified successfully.', token });
+});
+
+// Check verification token (replaces localStorage-based gate bypass)
+app.post('/api/otp/check', csrfProtect, (req, res) => {
+  const { token } = req.body;
+  if (!token) return res.status(400).json({ error: 'Token required.' });
+  const email = verifyVerifyToken(token);
+  if (!email) return res.status(401).json({ error: 'Invalid or expired token.' });
+  res.json({ success: true, email });
 });
 
 // Submit consultation form
-app.post('/api/consultation/submit', consultLimiter, async (req, res) => {
+app.post('/api/consultation/submit', consultLimiter, csrfProtect, async (req, res) => {
   const { firstName, lastName, email, company, companySize, hrChallenge, message } = req.body;
 
   if (!firstName?.trim() || !lastName?.trim() || !email?.trim() || !company?.trim()) {
@@ -279,7 +419,7 @@ app.post('/api/consultation/submit', consultLimiter, async (req, res) => {
   const d = {
     firstName:   firstName.trim().slice(0, 100),
     lastName:    lastName.trim().slice(0, 100),
-    email:       email.trim().slice(0, 254),
+    email:       email.toLowerCase().trim().slice(0, 254),
     company:     company.trim().slice(0, 200),
     companySize: (companySize || '').trim().slice(0, 100),
     hrChallenge: (hrChallenge || '').trim().slice(0, 200),
@@ -305,7 +445,7 @@ app.post('/api/consultation/submit', consultLimiter, async (req, res) => {
       from:    `"Katy AI by Makoy" <${process.env.SMTP_USER || 'team@makoy.org'}>`,
       to:      d.email,
       subject: `We've received your consultation request — Katy AI`,
-      html:    consultConfirmHtml(d.firstName, d.company),
+      html:    consultConfirmHtml(d.firstName, d.company, d.email),
       text:    `Hi ${d.firstName},\n\nThank you for your consultation request! We'll be in touch within 24 hours to schedule your free 30-minute discovery call.\n\nThe Katy AI Team\nteam@makoy.org`
     });
 
@@ -316,6 +456,28 @@ app.post('/api/consultation/submit', consultLimiter, async (req, res) => {
     console.error('Consultation email error:', err.message);
     res.status(500).json({ error: 'Failed to submit request. Please email us at team@makoy.org' });
   }
+});
+
+// Unsubscribe — GET link from email footer
+app.get('/api/unsubscribe', async (req, res) => {
+  const { email, token } = req.query;
+  if (!email || !token) {
+    return res.status(400).send('<h2>Invalid unsubscribe link.</h2>');
+  }
+  const emailLower = email.toLowerCase().trim();
+  const expected   = generateUnsubToken(emailLower);
+  if (token !== expected) {
+    return res.status(400).send('<h2>Invalid unsubscribe link.</h2>');
+  }
+  await markOptedOut(emailLower);
+  console.log(`🚫  Unsubscribed: ${emailLower}`);
+  res.send(`<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Unsubscribed</title></head>
+<body style="font-family:Arial,sans-serif;text-align:center;padding:60px;background:#F7F2EA;">
+  <h2 style="color:#3D2B1F;">You've been unsubscribed.</h2>
+  <p style="color:#6B4C3B;">You will no longer receive emails from Katy AI by Makoy.</p>
+  <p style="font-size:13px;color:#9B7B6B;margin-top:40px;">Questions? <a href="mailto:team@makoy.org" style="color:#C4724A;">team@makoy.org</a></p>
+</body></html>`);
 });
 
 // ─── SPA Fallback ──────────────────────────────────────────
@@ -337,7 +499,7 @@ app.use((err, _req, res, _next) => {
 app.listen(PORT, () => {
   console.log(`\n🌿  Katy AI server running on port ${PORT}`);
   console.log(`    Mode  : ${process.env.NODE_ENV || 'development'}`);
-  console.log(`    Email : ${process.env.SMTP_USER || 'team@makoy.org (set SMTP_PASS in .env)'}\n`);
+  console.log(`    Email : ${process.env.SMTP_USER ? '(configured)' : 'team@makoy.org (set SMTP_PASS in .env)'}\n`);
 });
 
 module.exports = app;

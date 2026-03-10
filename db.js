@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS leads (
   opted_in_at         DATETIME        DEFAULT NULL,
   verified_at         DATETIME        DEFAULT NULL,
   consulted_at        DATETIME        DEFAULT NULL,
+  opted_out_at        DATETIME        DEFAULT NULL,
 
   -- Metadata
   created_at          DATETIME        DEFAULT CURRENT_TIMESTAMP,
@@ -86,6 +87,10 @@ async function initDb() {
   try {
     const conn = await pool.getConnection();
     await conn.query(CREATE_LEADS_TABLE);
+    // Migration: add opted_out_at if this table predates it
+    await conn.query(
+      `ALTER TABLE leads ADD COLUMN IF NOT EXISTS opted_out_at DATETIME DEFAULT NULL`
+    );
     conn.release();
     dbReady = true;
     console.log('✅  MySQL connected — leads table ready');
@@ -185,4 +190,20 @@ async function upsertConsultation(data) {
   }
 }
 
-module.exports = { initDb, upsertEmailCapture, markEmailVerified, upsertConsultation };
+/**
+ * Called when a user clicks the unsubscribe link in an email.
+ * Sets opted_out_at to prevent future marketing email sends.
+ */
+async function markOptedOut(email) {
+  if (!dbReady) return;
+  try {
+    await pool.execute(
+      `UPDATE leads SET opted_out_at = IF(opted_out_at IS NULL, NOW(), opted_out_at), updated_at = NOW() WHERE email = ?`,
+      [email.toLowerCase().trim()]
+    );
+  } catch (err) {
+    console.warn('DB markOptedOut error:', err.message);
+  }
+}
+
+module.exports = { initDb, upsertEmailCapture, markEmailVerified, upsertConsultation, markOptedOut };

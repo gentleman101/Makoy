@@ -8,6 +8,7 @@ const crypto     = require('crypto');
 const cors       = require('cors');
 const rateLimit  = require('express-rate-limit');
 const path       = require('path');
+const { initDb, upsertEmailCapture, markEmailVerified, upsertConsultation } = require('./db');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -78,6 +79,9 @@ if (process.env.SMTP_PASS) {
     .then(() => console.log('✅  Email transporter ready'))
     .catch(err => console.warn('⚠️  Email transporter:', err.message));
 }
+
+// Init MySQL (non-blocking — site works without it)
+initDb();
 
 // ─── Helpers ───────────────────────────────────────────────
 const generateOtp  = () => crypto.randomInt(100000, 999999).toString();
@@ -191,6 +195,15 @@ app.post('/api/otp/request', otpRequestLimiter, async (req, res) => {
 
   otpStore.set(emailLower, { otp, expires, attempts: 0 });
 
+  // Capture email in DB (non-blocking, pass through any UTM params)
+  upsertEmailCapture(emailLower, {
+    source:      'website',
+    page:        req.body.sourcePage    || null,
+    utmSource:   req.body.utm_source    || null,
+    utmMedium:   req.body.utm_medium    || null,
+    utmCampaign: req.body.utm_campaign  || null
+  });
+
   try {
     await transporter.sendMail({
       from:    `"Katy AI by Makoy" <${process.env.SMTP_USER || 'team@makoy.org'}>`,
@@ -245,6 +258,7 @@ app.post('/api/otp/verify', otpVerifyLimiter, (req, res) => {
 
   // Verified!
   otpStore.delete(emailLower);
+  markEmailVerified(emailLower); // non-blocking DB update
   console.log(`✅  OTP verified for ${emailLower}`);
   res.json({ success: true, message: 'Email verified successfully.' });
 });
@@ -295,6 +309,7 @@ app.post('/api/consultation/submit', consultLimiter, async (req, res) => {
       text:    `Hi ${d.firstName},\n\nThank you for your consultation request! We'll be in touch within 24 hours to schedule your free 30-minute discovery call.\n\nThe Katy AI Team\nteam@makoy.org`
     });
 
+    upsertConsultation(d); // non-blocking DB enrichment
     console.log(`📋  Consultation: ${d.firstName} ${d.lastName} (${d.company})`);
     res.json({ success: true, message: 'Request submitted. Check your email for confirmation.' });
   } catch (err) {

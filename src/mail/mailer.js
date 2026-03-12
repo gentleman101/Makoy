@@ -1,5 +1,11 @@
 const nodemailer = require('nodemailer');
 
+const esc = (s) => String(s)
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;');
+
 const transporter = nodemailer.createTransport({
   host:   process.env.SMTP_HOST,
   port:   parseInt(process.env.SMTP_PORT),
@@ -57,7 +63,7 @@ async function sendConsultationAlert(data) {
     from:    `"Katy AI Website" <${process.env.SMTP_USER}>`,
     to:      process.env.TEAM_EMAIL,
     replyTo: email,
-    subject: `New consultation request — ${firstName} ${lastName} (${company})`,
+    subject: `New consultation request — ${esc(firstName)} ${esc(lastName)} (${esc(company)})`,
     html: emailBase(`
       <h2 style="color:#A05A35;border-bottom:2px solid #EDE5D8;padding-bottom:0.5rem;">
         New Consultation Request 🗓️
@@ -65,32 +71,32 @@ async function sendConsultationAlert(data) {
       <table style="width:100%;border-collapse:collapse;margin-top:1rem;">
         <tr>
           <td style="padding:0.6rem;color:#6B4C3B;font-weight:600;width:130px;">Name</td>
-          <td style="padding:0.6rem;">${firstName} ${lastName}</td>
+          <td style="padding:0.6rem;">${esc(firstName)} ${esc(lastName)}</td>
         </tr>
         <tr style="background:#fff;">
           <td style="padding:0.6rem;color:#6B4C3B;font-weight:600;">Email</td>
           <td style="padding:0.6rem;">
-            <a href="mailto:${email}" style="color:#C4724A;">${email}</a>
+            <a href="mailto:${esc(email)}" style="color:#C4724A;">${esc(email)}</a>
           </td>
         </tr>
         <tr>
           <td style="padding:0.6rem;color:#6B4C3B;font-weight:600;">Company</td>
-          <td style="padding:0.6rem;">${company}</td>
+          <td style="padding:0.6rem;">${esc(company)}</td>
         </tr>
         <tr style="background:#fff;">
           <td style="padding:0.6rem;color:#6B4C3B;font-weight:600;">Size</td>
-          <td style="padding:0.6rem;">${size}</td>
+          <td style="padding:0.6rem;">${esc(size)}</td>
         </tr>
         <tr>
           <td style="padding:0.6rem;color:#6B4C3B;font-weight:600;">Challenge</td>
-          <td style="padding:0.6rem;">${challenge}</td>
+          <td style="padding:0.6rem;">${esc(challenge)}</td>
         </tr>
       </table>
       ${message ? `
         <div style="margin-top:1rem;padding:1rem;background:#fff;
                     border-radius:8px;border-left:3px solid #C4724A;">
           <strong style="color:#6B4C3B;">Additional notes:</strong>
-          <p style="margin:0.5rem 0 0;color:#3D2B1F;">${message}</p>
+          <p style="margin:0.5rem 0 0;color:#3D2B1F;">${esc(message)}</p>
         </div>` : ''}
       <p style="margin-top:1rem;color:#D4B896;font-size:0.78rem;">
         Sent from makoy.org · ${new Date().toUTCString()}

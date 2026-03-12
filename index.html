@@ -1758,29 +1758,20 @@
           <div id="gate-step-email">
             <div class="gate-icon">📬</div>
             <div class="gate-title">Access Free Resources</div>
-            <div class="gate-sub">Enter your work email and we'll send you a one-time code to unlock all our HR resources — no strings attached.</div>
+            <div class="gate-sub">Enter your work email and we'll send you a magic link to unlock all our HR resources — no strings attached.</div>
             <div class="gate-input-row">
-              <input type="email" class="gate-input" id="gate-email" placeholder="your@email.com">
-              <button class="gate-btn" onclick="requestOtp()">Send Code</button>
+              <input type="email" class="gate-input" id="gate-email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')sendMagicLink()">
+              <button class="gate-btn" onclick="sendMagicLink()">Send Link</button>
             </div>
             <div class="gate-note">We won't spam you. Just occasional insights from Katy AI.</div>
           </div>
 
-          <!-- Step 2: OTP -->
-          <div id="gate-step-otp" class="otp-step">
-            <div class="gate-icon">🔐</div>
+          <!-- Step 2: Link sent confirmation -->
+          <div id="gate-step-sent" style="display:none;">
+            <div class="gate-icon">✉️</div>
             <div class="gate-title">Check your inbox</div>
-            <div class="gate-sub" id="otp-sent-to">We sent a 6-digit code to your email.</div>
-            <div class="otp-inputs">
-              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" id="d1" oninput="moveNext(this,'d2')" onkeydown="moveBack(event,'d1','d1')">
-              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" id="d2" oninput="moveNext(this,'d3')" onkeydown="moveBack(event,'d2','d1')">
-              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" id="d3" oninput="moveNext(this,'d4')" onkeydown="moveBack(event,'d3','d2')">
-              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" id="d4" oninput="moveNext(this,'d5')" onkeydown="moveBack(event,'d4','d3')">
-              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" id="d5" oninput="moveNext(this,'d6')" onkeydown="moveBack(event,'d5','d4')">
-              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" id="d6" oninput="checkOtp()" onkeydown="moveBack(event,'d6','d5')">
-            </div>
-            <button class="gate-btn" style="width:100%;margin-top:0.4rem;" onclick="verifyOtp()">Verify & Unlock</button>
-            <div class="gate-note" style="margin-top:0.8rem;">Didn't get it? <span id="resend-btn" class="resend-link" onclick="resendOtp()">Resend code</span> · <span class="resend-link" onclick="backToEmail()">Change email</span></div>
+            <div class="gate-sub" id="gate-sent-to">We sent a magic link to your email. Click it to unlock all resources.</div>
+            <div class="gate-note" style="margin-top:1rem;">Didn't get it? <span class="resend-link" onclick="backToEmail()">Try a different email</span> · <span class="resend-link" id="resend-btn" onclick="resendLink()">Resend link</span></div>
           </div>
 
         </div>
@@ -1993,21 +1984,12 @@
   }
 
   // ─────────────────────────────────────────────────
-  // ── Resources gate — connected to backend API ──
+  // ── Resources gate — magic link flow ──
   // ─────────────────────────────────────────────────
   const API_BASE = 'https://api.makoy.org';
-  let csrfToken = '';
   let currentEmail = '';
 
-  async function fetchCsrfToken() {
-    try {
-      const res = await fetch(`${API_BASE}/api/csrf-token`);
-      const data = await res.json();
-      csrfToken = data.token || '';
-    } catch { csrfToken = ''; }
-  }
-
-  async function requestOtp() {
+  async function sendMagicLink() {
     const email = document.getElementById('gate-email').value.trim().toLowerCase();
     const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRe.test(email)) {
@@ -2016,86 +1998,32 @@
     }
 
     currentEmail = email;
-
     const btn = document.querySelector('#gate-step-email .gate-btn');
-    setLoading(btn, true, 'Send Code');
+    setLoading(btn, true, 'Send Link');
     try {
-      const res = await fetch(`${API_BASE}/api/otp/request`, {
+      const res = await fetch(`${API_BASE}/send-link`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
       });
       const data = await res.json();
       if (res.ok) {
-        document.getElementById('otp-sent-to').textContent = `We sent a 6-digit code to ${email}`;
+        if (data.already_verified) {
+          unlockResources();
+          return;
+        }
+        document.getElementById('gate-sent-to').textContent =
+          `We sent a magic link to ${email}. Click it to unlock all resources.`;
         document.getElementById('gate-step-email').style.display = 'none';
-        document.getElementById('gate-step-otp').style.display = 'block';
-        document.getElementById('d1').focus();
-        showToast(`Code sent to ${email} — check your inbox`);
+        document.getElementById('gate-step-sent').style.display = 'block';
+        showToast(`Magic link sent to ${email} — check your inbox`);
       } else {
-        showToast(data.error || 'Could not send code. Please try again.', 'error');
+        showToast(data.error || 'Could not send link. Please try again.', 'error');
       }
     } catch {
       showToast('Network error — please check your connection', 'error');
     } finally {
-      setLoading(btn, false, 'Send Code');
-    }
-  }
-
-  function moveNext(current, nextId) {
-    if (current.value.length === 1 && nextId) {
-      const next = document.getElementById(nextId);
-      if (next) next.focus();
-    }
-    checkOtp();
-  }
-
-  function moveBack(e, currentId, prevId) {
-    if (e.key === 'Backspace' && document.getElementById(currentId).value === '') {
-      const prev = document.getElementById(prevId);
-      if (prev && prevId !== currentId) prev.focus();
-    }
-  }
-
-  function getEnteredOtp() {
-    return ['d1','d2','d3','d4','d5','d6'].map(id => document.getElementById(id).value).join('');
-  }
-
-  function checkOtp() {
-    if (getEnteredOtp().length === 6) verifyOtp();
-  }
-
-  async function verifyOtp() {
-    const otp = getEnteredOtp();
-    if (otp.length < 6) return;
-
-    const btn = document.querySelector('#gate-step-otp .gate-btn');
-    const origLabel = 'Verify & Unlock';
-    setLoading(btn, true, origLabel);
-    try {
-      const res = await fetch(`${API_BASE}/api/otp/verify`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
-        body: JSON.stringify({ email: currentEmail, otp })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        if (data.token) localStorage.setItem('katyai_vtoken', data.token);
-        unlockResources();
-      } else {
-        showToast(data.error || 'Incorrect code — please try again', 'error');
-        ['d1','d2','d3','d4','d5','d6'].forEach(id => {
-          const el = document.getElementById(id);
-          el.value = '';
-          el.style.borderColor = '#e05555';
-          setTimeout(() => el.style.borderColor = '', 1400);
-        });
-        document.getElementById('d1').focus();
-      }
-    } catch {
-      showToast('Network error — please try again', 'error');
-    } finally {
-      setLoading(btn, false, origLabel);
+      setLoading(btn, false, 'Send Link');
     }
   }
 
@@ -2105,27 +2033,27 @@
     showToast('Resources unlocked — enjoy!');
   }
 
-  async function resendOtp() {
+  async function resendLink() {
     const btn = document.getElementById('resend-btn');
     if (btn) { btn.style.pointerEvents = 'none'; btn.textContent = 'Sending…'; }
     try {
-      await fetch(`${API_BASE}/api/otp/request`, {
+      await fetch(`${API_BASE}/send-link`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: currentEmail })
       });
-      showToast(`New code sent to ${currentEmail}`);
+      showToast(`New link sent to ${currentEmail}`);
     } catch {
       showToast('Could not resend — please try again', 'error');
     } finally {
       if (btn) {
-        setTimeout(() => { btn.style.pointerEvents = ''; btn.textContent = 'Resend code'; }, 30000);
+        setTimeout(() => { btn.style.pointerEvents = ''; btn.textContent = 'Resend link'; }, 30000);
       }
     }
   }
 
   function backToEmail() {
-    document.getElementById('gate-step-otp').style.display = 'none';
+    document.getElementById('gate-step-sent').style.display = 'none';
     document.getElementById('gate-step-email').style.display = 'block';
   }
 
@@ -2158,10 +2086,10 @@
     btn.style.opacity = '0.7';
 
     try {
-      const res = await fetch(`${API_BASE}/api/consultation/submit`, {
+      const res = await fetch(`${API_BASE}/contact`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
-        body: JSON.stringify({ firstName, lastName, email, company, companySize: size, hrChallenge: challenge, message })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstName, lastName, email, company, size, challenge, message })
       });
       const data = await res.json();
       if (res.ok) {
@@ -2180,28 +2108,19 @@
     }
   }
 
-  // ── Auto-unlock on load — validate server-signed token ──
-  window.addEventListener('DOMContentLoaded', async () => {
-    await fetchCsrfToken();
-    const vtoken = localStorage.getItem('katyai_vtoken');
-    if (!vtoken) return;
-    // Optimistically hide gate to prevent flash, then validate server-side
-    const overlay = document.getElementById('gate-overlay');
-    const preview = document.getElementById('resources-preview');
-    if (overlay) overlay.style.display = 'none';
-    if (preview) preview.classList.add('unlocked');
-    try {
-      const res = await fetch(`${API_BASE}/api/otp/check`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
-        body: JSON.stringify({ token: vtoken })
-      });
-      if (!res.ok) {
-        localStorage.removeItem('katyai_vtoken');
-        if (overlay) overlay.style.display = '';
-        if (preview) preview.classList.remove('unlocked');
-      }
-    } catch { /* network error — keep unlocked, token is cryptographically signed */ }
+  // ── Auto-unlock on load — detect ?unlocked=1 from magic link redirect ──
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('unlocked') === '1') {
+      unlockResources();
+      // Clean the URL without reloading
+      const clean = window.location.pathname + window.location.hash;
+      window.history.replaceState(null, '', clean);
+    } else if (params.get('unlocked') === 'error') {
+      showToast('That link has expired or already been used. Please request a new one.', 'error');
+      const clean = window.location.pathname + window.location.hash;
+      window.history.replaceState(null, '', clean);
+    }
   });
 </script>
 

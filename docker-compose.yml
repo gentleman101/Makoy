@@ -1,7 +1,9 @@
 services:
-  app:
+  makoy-api:
     build: .
     restart: unless-stopped
     ports:
-      - "127.0.0.1:3001:3000"   # nginx proxies from outside; never expose directly
+      - "127.0.0.1:3001:3001"   # nginx proxies from outside; never expose directly
     env_file: .env
+    volumes:
+      - ./data:/app/data         # persist SQLite DB across rebuilds

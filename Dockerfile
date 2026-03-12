@@ -1,14 +1,16 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
 # Install dependencies first (better layer caching)
-COPY package*.json ./
-RUN npm ci --omit=dev
+COPY package.json .
+RUN npm install --omit=dev
 
-# Copy only the server source files
-COPY server.js db.js ./
+COPY src/ ./src/
 
-EXPOSE 3000
+# Data directory for SQLite
+RUN mkdir -p /app/data
 
-CMD ["node", "server.js"]
+EXPOSE 3001
+
+CMD ["node", "src/index.js"]

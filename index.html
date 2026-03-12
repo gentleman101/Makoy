@@ -1995,12 +1995,13 @@
   // ─────────────────────────────────────────────────
   // ── Resources gate — connected to backend API ──
   // ─────────────────────────────────────────────────
+  const API_BASE = 'https://api.makoy.org';
   let csrfToken = '';
   let currentEmail = '';
 
   async function fetchCsrfToken() {
     try {
-      const res = await fetch('/api/csrf-token');
+      const res = await fetch(`${API_BASE}/api/csrf-token`);
       const data = await res.json();
       csrfToken = data.token || '';
     } catch { csrfToken = ''; }
@@ -2019,7 +2020,7 @@
     const btn = document.querySelector('#gate-step-email .gate-btn');
     setLoading(btn, true, 'Send Code');
     try {
-      const res = await fetch('/api/otp/request', {
+      const res = await fetch(`${API_BASE}/api/otp/request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
         body: JSON.stringify({ email })
@@ -2072,7 +2073,7 @@
     const origLabel = 'Verify & Unlock';
     setLoading(btn, true, origLabel);
     try {
-      const res = await fetch('/api/otp/verify', {
+      const res = await fetch(`${API_BASE}/api/otp/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
         body: JSON.stringify({ email: currentEmail, otp })
@@ -2108,7 +2109,7 @@
     const btn = document.getElementById('resend-btn');
     if (btn) { btn.style.pointerEvents = 'none'; btn.textContent = 'Sending…'; }
     try {
-      await fetch('/api/otp/request', {
+      await fetch(`${API_BASE}/api/otp/request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
         body: JSON.stringify({ email: currentEmail })
@@ -2157,7 +2158,7 @@
     btn.style.opacity = '0.7';
 
     try {
-      const res = await fetch('/api/consultation/submit', {
+      const res = await fetch(`${API_BASE}/api/consultation/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
         body: JSON.stringify({ firstName, lastName, email, company, companySize: size, hrChallenge: challenge, message })
@@ -2190,7 +2191,7 @@
     if (overlay) overlay.style.display = 'none';
     if (preview) preview.classList.add('unlocked');
     try {
-      const res = await fetch('/api/otp/check', {
+      const res = await fetch(`${API_BASE}/api/otp/check`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
         body: JSON.stringify({ token: vtoken })

@@ -29,30 +29,34 @@ const emailBase = (content) => `
 async function sendMagicLink(email, token) {
   const link = `${process.env.API_URL}/verify?token=${token}&email=${encodeURIComponent(email)}`;
   await transporter.sendMail({
-    from:    `"Katy AI by Makoy" <${process.env.SMTP_USER}>`,
+    from:    `"Katy from Makoy" <${process.env.SMTP_USER}>`,
     to:      email,
-    subject: 'Your free resources from Katy AI',
+    subject: 'I saved your resources — one click to open them 🌿',
     html: emailBase(`
-      <div style="text-align:center;margin-bottom:1.5rem;">
-        <span style="font-size:2rem;">🫐</span>
-        <h2 style="color:#A05A35;margin:0.5rem 0 0;font-size:1.4rem;">
-          You're one click away
-        </h2>
-      </div>
-      <p style="color:#6B4C3B;line-height:1.7;">
-        Click below to instantly unlock your free HR resources.
-        This link expires in <strong>30 minutes</strong> and works once only.
+      <p style="color:#6B4C3B;font-size:1rem;line-height:1.8;margin:0 0 1.2rem;">
+        Hi there,
       </p>
-      <div style="text-align:center;margin:2rem 0;">
+      <p style="color:#6B4C3B;font-size:1rem;line-height:1.8;margin:0 0 1.2rem;">
+        It's Katy. I put together these HR resources because I know how much time
+        gets lost searching for the right frameworks, templates, and thinking —
+        especially when you're in the middle of something that actually matters.
+      </p>
+      <p style="color:#6B4C3B;font-size:1rem;line-height:1.8;margin:0 0 2rem;">
+        Click below and everything unlocks instantly. The link is good for
+        <strong>30 minutes</strong> and works once — so don't sit on it too long.
+      </p>
+      <div style="text-align:center;margin:0 0 2rem;">
         <a href="${link}"
            style="background:#C4724A;color:white;padding:0.9rem 2.2rem;
                   border-radius:50px;text-decoration:none;font-weight:600;
                   font-size:1rem;display:inline-block;">
-          Unlock My Resources →
+          Open my resources →
         </a>
       </div>
-      <p style="color:#D4B896;font-size:0.78rem;text-align:center;">
-        If you didn't request this, simply ignore this email.
+      <p style="color:#9B8B80;font-size:0.85rem;line-height:1.7;margin:0;">
+        If something doesn't work or you have a question, just reply to this email —
+        it comes straight to me.<br>
+        — Katy
       </p>`)
   });
 }
@@ -60,7 +64,7 @@ async function sendMagicLink(email, token) {
 async function sendConsultationAlert(data) {
   const { firstName, lastName, email, company, size, challenge, message } = data;
   await transporter.sendMail({
-    from:    `"Katy AI Website" <${process.env.SMTP_USER}>`,
+    from:    `"Katy from Makoy" <${process.env.SMTP_USER}>`,
     to:      process.env.TEAM_EMAIL,
     replyTo: email,
     subject: `New consultation request — ${esc(firstName)} ${esc(lastName)} (${esc(company)})`,
@@ -104,4 +108,30 @@ async function sendConsultationAlert(data) {
   });
 }
 
-module.exports = { sendMagicLink, sendConsultationAlert };
+async function sendConsultationConfirm(data) {
+  const { firstName, email } = data;
+  await transporter.sendMail({
+    from:    `"Katy from Makoy" <${process.env.SMTP_USER}>`,
+    to:      email,
+    subject: `Got it, ${esc(firstName)} — I'll be in touch soon`,
+    html: emailBase(`
+      <p style="color:#6B4C3B;font-size:1rem;line-height:1.8;margin:0 0 1.2rem;">
+        Hi ${esc(firstName)},
+      </p>
+      <p style="color:#6B4C3B;font-size:1rem;line-height:1.8;margin:0 0 1.2rem;">
+        It's Katy. I've received your message and I'm genuinely looking forward
+        to learning more about what's going on at ${esc(data.company)}.
+      </p>
+      <p style="color:#6B4C3B;font-size:1rem;line-height:1.8;margin:0 0 1.2rem;">
+        I'll reach out within <strong>24 hours</strong> to find a time that works
+        for a proper conversation — no pitch, just a real chat about your HR challenges
+        and whether I can actually help.
+      </p>
+      <p style="color:#9B8B80;font-size:0.85rem;line-height:1.7;margin:0;">
+        In the meantime, if anything comes to mind, just reply here.<br>
+        — Katy
+      </p>`)
+  });
+}
+
+module.exports = { sendMagicLink, sendConsultationAlert, sendConsultationConfirm };

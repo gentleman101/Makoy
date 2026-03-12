@@ -1,5 +1,5 @@
 const express = require('express');
-const { sendConsultationAlert } = require('../mail/mailer');
+const { sendConsultationAlert, sendConsultationConfirm } = require('../mail/mailer');
 
 module.exports = (limiter) => {
   const router = express.Router();
@@ -24,6 +24,7 @@ module.exports = (limiter) => {
 
     try {
       await sendConsultationAlert(d);
+      sendConsultationConfirm(d).catch(e => console.error('Confirm mail error:', e.message));
       res.json({ success: true });
     } catch (err) {
       console.error('Contact mail error:', err.message);

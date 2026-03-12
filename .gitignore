@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# SQLite database (volume-mounted on server)
+data/
+
 # Environment variables — NEVER commit this
 .env
 .env.local

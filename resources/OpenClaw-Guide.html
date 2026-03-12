@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<!-- saved from url=(0058)file:///C:/Users/naman.pandey/Downloads/openclaw_kimi.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 Build Your Free AI Server - aiwithnaman | Now You Know</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #f59e0b;
+            --dark: #1e1b4b;
+            --light: #f8fafc;
+            --code-bg: #1e293b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --brand: #e11d48;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .brand-header {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .instagram-badge {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: transform 0.3s;
+        }
+        
+        .instagram-badge:hover {
+            transform: scale(1.05);
+        }
+        
+        .download-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .step-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+        }
+        
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        
+        .step-title {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        .fun-fact {
+            background: #fef3c7;
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+            font-style: italic;
+        }
+        
+        .warning-box {
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .tip-box {
+            background: #d1fae5;
+            border-left: 4px solid var(--success);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .brand-box {
+            background: linear-gradient(135deg, #ffe4e6, #fecdd3);
+            border-left: 4px solid var(--brand);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+            font-weight: 600;
+            color: var(--brand);
+        }
+        
+        .code-block {
+            background: var(--code-bg);
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            overflow-x: auto;
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        .code-block::before {
+            content: 'Terminal';
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-size: 0.8em;
+            color: #64748b;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 5px;
+            right: 80px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            z-index: 1001;
+            transition: width 0.3s;
+        }
+        
+        .checklist {
+            list-style: none;
+        }
+        
+        .checklist li {
+            padding: 10px 0;
+            padding-left: 35px;
+            position: relative;
+        }
+        
+        .checklist li::before {
+            content: '☐';
+            position: absolute;
+            left: 0;
+            font-size: 1.5em;
+            color: var(--primary);
+            cursor: pointer;
+        }
+        
+        .checklist li.checked::before {
+            content: '☑';
+            color: var(--success);
+        }
+        
+        .analogy-box {
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 2px dashed var(--primary);
+        }
+        
+        .analogy-box h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        @media print {
+            .download-btn, .progress-bar, .copy-btn, .brand-header {
+                display: none;
+            }
+            
+            .step-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+        
+        .emoji-big {
+            font-size: 2em;
+            margin-right: 10px;
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #fde047 0%, #fde047 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 0.4em;
+            background-position: 0 88%;
+            padding: 0 4px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background: var(--primary);
+            color: white;
+        }
+        
+        tr:hover {
+            background: #f1f5f9;
+        }
+        
+        .catchphrase {
+            font-style: italic;
+            color: var(--brand);
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar" style="width: 12.3509%;"></div>
+    
+    <div class="brand-header">
+        📱 Follow @aiwithnaman on Instagram for more AI tutorials • Now You Know
+    </div>
+    
+    <button class="download-btn" onclick="downloadPDF()">📥 Download as PDF</button>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Build Your Free AI Automation Server</h1>
+            <p>Oracle VPS • Docker • OpenClaw • Gemini • Telegram<br>
+            <em>A guide so simple, your pet rock could follow it (almost)</em></p>
+            <a href="https://instagram.com/aiwithnaman" target="_blank" class="instagram-badge">
+                📸 Follow @aiwithnaman
+            </a>
+        </div>
+
+        <!-- Step 0: The Big Picture -->
+        <div class="step-card">
+            <div class="step-number">0</div>
+            <h2 class="step-title">Wait, What Are We Building?</h2>
+            
+            <p>Imagine having a personal robot butler that lives in the cloud, works 24/7, costs exactly <span class="highlight">$0</span>, and doesn't judge your Spotify playlist. That's what we're building!</p>
+            
+            <div class="analogy-box">
+                <h4>🎯 The "Two-Layer Cake" Approach</h4>
+                <p>Most people think AI needs a supercomputer that costs more than a car. We're smarter than that! We're using:</p>
+                <ul>
+                    <li><strong>The Hands (Your Free Server):</strong> Does the actual work, runs scripts, manages stuff</li>
+                    <li><strong>The Brain (Google's Gemini):</strong> Does the thinking, but lives on Google's dime, not yours</li>
+                </ul>
+                <p>It's like having a really smart friend who does your homework while you take credit for it. Except legal! <span class="catchphrase">Now you know.</span></p>
+            </div>
+            
+            <div class="fun-fact">
+                💡 <strong>Fun Fact:</strong> Oracle gives you a free server forever. Yes, actually forever. No, it's not a trap. Yes, we checked (twice). <span class="catchphrase">Now you know.</span>
+            </div>
+        </div>
+
+        <!-- Step 1: Oracle Account -->
+        <div class="step-card">
+            <div class="step-number">1</div>
+            <h2 class="step-title">Get Your Free Cloud Server (a.k.a. "The Free Real Estate")</h2>
+            
+            <h3>📝 What You Need Before We Start</h3>
+            <ul class="checklist">
+                <li class="">A computer (Windows, Mac, or Linux - we're not picky)</li>
+                <li class="">A phone with Telegram</li>
+                <li>A Google account</li>
+                <li>A credit card (for verification only - you won't be charged!)</li>
+                <li>About 30 minutes and a can-do attitude</li>
+            </ul>
+            
+            <h3>🚀 Let's Create Your Oracle Account</h3>
+            <p>Head to <strong>cloud.oracle.com</strong> and sign up. Pick the region closest to you (this affects speed, and no, you can't change it later without starting over, so choose wisely, young padawan).</p>
+            
+            <div class="warning-box">
+                ⚠️ <strong>Heads Up:</strong> You'll need a credit card for identity verification. Oracle promises not to charge you for the "Always Free" tier. If they do, you have our permission to send an angry email.
+            </div>
+            
+            <div class="brand-box">
+                🛡️ <strong>Safety First from @aiwithnaman:</strong> Here's the deal - Oracle asks for your credit card to verify you're a real human, not a bot trying to mine crypto. As long as you ONLY select "Always Free" resources, you will NEVER be charged. But here's the pro tip: Go to Billing → Alerts and set a spending limit of $1. This way, if you accidentally click something paid, you'll get an email alert when you hit $1 and your services will stop. Better safe than sorry! <span class="catchphrase">Now you know.</span>
+            </div>
+            
+            <h3>🖥️ Creating Your Server</h3>
+            <p>Once logged in:</p>
+            <ol>
+                <li>Go to: <strong>Compute → Instances</strong></li>
+                <li>Click <strong>"Create Instance"</strong> (the big shiny button)</li>
+                <li>Use these settings (copy them exactly, future-you will thank you):</li>
+            </ol>
+            
+            <table>
+                <tbody><tr>
+                    <th>Setting</th>
+                    <th>What to Choose</th>
+                </tr>
+                <tr>
+                    <td>Operating System</td>
+                    <td>Ubuntu 22.04 LTS</td>
+                </tr>
+                <tr>
+                    <td>Shape</td>
+                    <td>VM.Standard.A1.Flex (the free one!)</td>
+                </tr>
+                <tr>
+                    <td>CPU cores</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>Memory</td>
+                    <td>24 GB </td>
+                </tr>
+                <tr>
+                    <td>Storage</td>
+                    <td>200 GB</td>
+                </tr>
+                <tr>
+                    <td>SSH Key</td>
+                    <td>Click "Generate SSH Key Pair" and download both files</td>
+                </tr>
+            </tbody></table>
+            
+            <div class="warning-box">
+                ⚠️ <strong>"Out of Capacity" Error?</strong> ARM servers are popular (because they're free, duh). Try again in a few hours, or switch to a different "Availability Domain" in the same region. Persistence is key!
+            </div>
+        </div>
+
+        <!-- Step 2: Connect -->
+        <div class="step-card">
+            <div class="step-number">2</div>
+            <h2 class="step-title">Connect to Your Server (a.k.a. "Remote Control Time")</h2>
+            
+            <p>SSH is like a text-based remote control for your server. Don't worry, it's less scary than it sounds.</p>
+            
+            <div class="analogy-box">
+                <h4>🎮 SSH Explained Like You're Five</h4>
+                <p>Imagine your server is a TV in another building. SSH is the universal remote that lets you change channels from your house. Except instead of changing channels, you're typing commands, and instead of a TV, it's a computer. Okay, the analogy broke down, but you get the idea. <span class="catchphrase">Now you know.</span></p>
+            </div>
+            
+            <h3>For Mac/Linux Users:</h3>
+            <p>Open Terminal (it's in Applications → Utilities, or press Cmd+Space and type "Terminal")</p>
+            
+            <p>First, make your SSH key secure (SSH is paranoid about file permissions):</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+chmod 400 /path/to/your-downloaded-key.key
+            </div>
+            
+            <p>Then connect:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+ssh -i /path/to/your-downloaded-key.key ubuntu@YOUR_SERVER_IP
+            </div>
+            
+            <h3>For Windows Users:</h3>
+            <p>Open PowerShell (right-click Start button → Windows PowerShell)</p>
+            <p>Use the same commands as above! Windows finally caught up.</p>
+            
+            <div class="tip-box">
+                ✅ <strong>Success Check:</strong> If you see something like <code>ubuntu@your-server-name:~$</code>, you're in! You did it! Take a moment to feel like a hacker in a movie.
+            </div>
+        </div>
+
+        <!-- Step 3: Server Prep -->
+        <div class="step-card">
+            <div class="step-number">3</div>
+            <h2 class="step-title">Prepare Your Server (a.k.a. "Installing the Basics")</h2>
+            
+            <p>Fresh servers are like new phones - they need updates before they're useful.</p>
+            
+            <h3>Update Everything</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+sudo apt update &amp;&amp; sudo apt upgrade -y
+            </div>
+            <p>This says: "Hey Ubuntu, check for updates and install them. Say yes to everything." It'll take a few minutes - perfect time for a coffee break!</p>
+            
+            <h3>Install Essential Tools</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+sudo apt install -y git curl python3 python3-pip python3-venv
+            </div>
+            
+            <table>
+                <tbody><tr>
+                    <th>Tool</th>
+                    <th>What It Does</th>
+                </tr>
+                <tr>
+                    <td>git</td>
+                    <td>Downloads code from the internet (like an app store for nerds)</td>
+                </tr>
+                <tr>
+                    <td>curl</td>
+                    <td>Downloads files from web links</td>
+                </tr>
+                <tr>
+                    <td>python3</td>
+                    <td>The programming language that runs everything</td>
+                </tr>
+                <tr>
+                    <td>python3-pip</td>
+                    <td>Python's package manager (app store for Python)</td>
+                </tr>
+                <tr>
+                    <td>python3-venv</td>
+                    <td>Keeps Python projects separate so they don't fight</td>
+                </tr>
+            </tbody></table>
+            
+            <div class="brand-box">
+                💡 <strong>Pro Tip from @aiwithnaman:</strong> These tools are the foundation of almost every cloud project. Learn what each does and you'll be ahead of 90% of beginners. <span class="catchphrase">Now you know.</span>
+            </div>
+            
+            <h3>Turn On the Firewall (Lock the Door)</h3>
+            <div class="warning-box">
+                ⚠️ <strong>CRITICAL:</strong> Run these commands in EXACTLY this order! If you enable the firewall before allowing SSH, you'll lock yourself out. Then you'll have to rebuild your server and explain to your friends why you disappeared for an hour.
+            </div>
+            
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+sudo ufw allow ssh
+sudo ufw enable
+            </div>
+            
+            <p>Check if it's working:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+sudo ufw status
+            </div>
+        </div>
+
+        <!-- Step 4: Docker -->
+        <div class="step-card">
+            <div class="step-number">4</div>
+            <h2 class="step-title">Install Docker (a.k.a. "The Apartment Manager")</h2>
+            
+            <div class="analogy-box">
+                <h4>🏢 What is Docker?</h4>
+                <p>Docker creates isolated "containers" - think of them as apartments in a building. Each apartment has its own kitchen, furniture, and rules. What happens in Apartment A doesn't affect Apartment B. Your server is the building, and Docker is the super. <span class="catchphrase">Now you know.</span></p>
+            </div>
+            
+            <h3>Install Docker</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+sudo apt install -y docker.io
+sudo systemctl start docker
+sudo systemctl enable docker
+            </div>
+            
+            <h3>Make Docker Play Nice (No More sudo Every Time)</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+sudo usermod -aG docker $USER
+exit
+            </div>
+            
+            <p>Then reconnect with SSH (same command as before). After that, you can run <code>docker ps</code> without sudo!</p>
+            
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+docker ps
+            </div>
+            
+            <div class="tip-box">
+                ✅ If you see a table (even if empty), Docker is working! If you see "permission denied", you forgot to log out and back in. We all have those days.
+            </div>
+        </div>
+
+        <!-- Step 5: Gemini API -->
+        <div class="step-card">
+            <div class="step-number">5</div>
+            <h2 class="step-title">Get Your Free Gemini API Key (a.k.a. "The Brain Password")</h2>
+            
+            <p>An API key is like a VIP pass that lets your server talk to Google's AI. Without it, your server is just a very expensive calculator.</p>
+            
+            <h3>Getting the Key</h3>
+            <ol>
+                <li>Go to <strong>aistudio.google.com</strong></li>
+                <li>Sign in with your Google account</li>
+                <li>Click "Get API key" in the left sidebar</li>
+                <li>Click "Create API key" and select any project (or make a new one)</li>
+                <li>Copy the key that appears - it looks like random gibberish (that's good!)</li>
+            </ol>
+            
+            <div class="warning-box">
+                🔒 <strong>Guard This With Your Life!</strong> Your API key is like a credit card number. Don't paste it in emails, chats, or public forums. If someone gets it, they can use your AI quota. Not cool.
+            </div>
+            
+            <div class="fun-fact">
+                💡 <strong>Note on Claude:</strong> A Claude.ai subscription (the chat website) is NOT the same as API access. They're separate products with separate billing. We're using Gemini because it has a free tier. Free is our favorite price! <span class="catchphrase">Now you know.</span>
+            </div>
+        </div>
+
+        <!-- Step 6: OpenClaw -->
+        <div class="step-card">
+            <div class="step-number">6</div>
+            <h2 class="step-title">Install OpenClaw (a.k.a. "The Ringmaster")</h2>
+            
+            <div class="analogy-box">
+                <h4>🎪 What is OpenClaw?</h4>
+                <p>OpenClaw is the manager that sits between you, Telegram, Gemini, and your agents. It's like a really efficient secretary who takes your messages, asks the AI for help when needed, and delegates tasks to the right "agent" (container).</p>
+                <p>We install it directly on the server (not in a container) so it can see and control all the containers. It's the boss with keys to every office. <span class="catchphrase">Now you know.</span></p>
+            </div>
+            
+            <h3>Install It</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+curl -fsSL https://openclaw.ai/install.sh | bash
+            </div>
+            
+            <p>Reload your terminal:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+source ~/.bashrc
+            </div>
+            
+            <p>Check if it worked:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+openclaw --version
+            </div>
+            
+            <h3>Set Up Your AI Model</h3>
+            <p>See what models are available:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+openclaw models
+            </div>
+            
+            <p>Set Gemini as your model (copy the EXACT name from the list):</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+openclaw models set google/gemini-2.5-flash-lite
+            </div>
+            
+            <div class="warning-box">
+                ⚠️ <strong>Exact Names Only!</strong> OpenClaw is picky about model names. If you type "gemini-2.5-flash-lite-preview" when it wants "gemini-2.5-flash-lite", it will throw a tantrum. Copy-paste is your friend.
+            </div>
+            
+            <h3>Add Your API Key</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+openclaw config set gemini_api_key YOUR_API_KEY_HERE
+            </div>
+            <p>Replace YOUR_API_KEY_HERE with the key you got in Step 5. Obviously.</p>
+        </div>
+
+        <!-- Step 7: Create Agents -->
+        <div class="step-card">
+            <div class="step-number">7</div>
+            <h2 class="step-title">Create Your Agent Containers (a.k.a. "Building the Offices")</h2>
+            
+            <p>We're making two agents: <strong>agent-alpha</strong> and <strong>agent-beta</strong>. Why two? So you can see how routing works! You could make one, or ten - the process is the same.</p>
+            
+            <h3>Create Workspace Folders</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+mkdir -p ~/server/agent-alpha/tools
+mkdir -p ~/server/agent-beta/tools
+            </div>
+            
+            <h3>Create Agent Alpha (The First Apartment)</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+docker run -d \
+  --name agent-alpha \
+  --restart unless-stopped \
+  -p 18790:18790 \
+  -v ~/server/agent-alpha:/workspace \
+  ubuntu:22.04 \
+  sleep infinity
+            </div>
+            
+            <h3>Create Agent Beta (The Second Apartment)</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+docker run -d \
+  --name agent-beta \
+  --restart unless-stopped \
+  -p 18791:18791 \
+  -v ~/server/agent-beta:/workspace \
+  ubuntu:22.04 \
+  sleep infinity
+            </div>
+            
+            <div class="tip-box">
+                📋 <strong>What This Does:</strong> Creates isolated containers that restart automatically if they crash, maps ports so OpenClaw can talk to them, and connects folders so files persist even if the container restarts.
+            </div>
+            
+            <p>Check if they're running:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+docker ps
+            </div>
+            
+            <h3>Install Tools Inside Each Container</h3>
+            <p>Enter agent-alpha and install tools:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+docker exec -it agent-alpha bash
+apt update &amp;&amp; apt install -y curl python3 python3-pip
+exit
+            </div>
+            
+            <p>Do the same for agent-beta:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+docker exec -it agent-beta bash
+apt update &amp;&amp; apt install -y curl python3 python3-pip
+exit
+            </div>
+        </div>
+
+        <!-- Step 8: Register Agents -->
+        <div class="step-card">
+            <div class="step-number">8</div>
+            <h2 class="step-title">Register Agents with OpenClaw (a.k.a. "Hiring the Staff")</h2>
+            
+            <p>The containers exist, but OpenClaw doesn't know about them yet. Let's introduce them!</p>
+            
+            <h3>Register Agent Alpha</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+openclaw agents register \
+  --name agent-alpha \
+  --type docker \
+  --container agent-alpha \
+  --workdir /workspace \
+  --port 18790
+            </div>
+            
+            <h3>Register Agent Beta</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+openclaw agents register \
+  --name agent-beta \
+  --type docker \
+  --container agent-beta \
+  --workdir /workspace \
+  --port 18791
+            </div>
+            
+            <h3>Verify Registration</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+openclaw agents list
+            </div>
+            
+            <div class="tip-box">
+                ✅ Both should show as "available". If they do, congratulations! You've got two obedient digital servants ready to do your bidding.
+            </div>
+        </div>
+
+        <!-- Step 9: Telegram -->
+        <div class="step-card">
+            <div class="step-number">9</div>
+            <h2 class="step-title">Set Up Telegram (a.k.a. "Your Remote Control")</h2>
+            
+            <p>BotFather is Telegram's official bot for creating bots. Yes, it's bots all the way down.</p>
+            
+            <h3>Create Your Bot</h3>
+            <ol>
+                <li>Open Telegram and search for <strong>@BotFather</strong></li>
+                <li>Start a chat and send: <code>/newbot</code></li>
+                <li>Name it something like: <strong>My AI Server</strong></li>
+                <li>Username must end in 'bot', like: <strong>myaiserver_bot</strong></li>
+                <li>BotFather will give you a token (long string of random characters). Save it!</li>
+            </ol>
+            
+            <div class="warning-box">
+                🔒 <strong>Keep This Token Secret!</strong> Anyone with this token controls your bot. Don't share it, don't commit it to GitHub, don't tattoo it on your arm (okay, maybe that last one is fine, but cover it up).
+            </div>
+            
+            <h3>Connect Telegram to OpenClaw</h3>
+            <p>Start the OpenClaw gateway temporarily:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+openclaw gateway --port 18789
+            </div>
+            
+            <p>In a new terminal window (new SSH session), add your bot:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+openclaw channels add telegram --token YOUR_BOT_TOKEN
+            </div>
+            
+            <p>Now open Telegram, find your bot, and send it any message (like "hello"). A pairing code will appear in your server terminal. Approve it:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+openclaw pairing approve telegram PAIRING_CODE
+            </div>
+            
+            <div class="fun-fact">
+                🎉 <strong>You Did It!</strong> Your Telegram bot is now connected. You can send messages to your server from anywhere in the world! <span class="catchphrase">Now you know.</span>
+            </div>
+            
+            <h3>How to Use Your Bot</h3>
+            <table>
+                <tbody><tr>
+                    <th>You Send</th>
+                    <th>What Happens</th>
+                </tr>
+                <tr>
+                    <td>@alpha check disk usage</td>
+                    <td>Task goes to agent-alpha</td>
+                </tr>
+                <tr>
+                    <td>@beta run my script</td>
+                    <td>Task goes to agent-beta</td>
+                </tr>
+                <tr>
+                    <td>/status</td>
+                    <td>Checks OpenClaw gateway</td>
+                </tr>
+                <tr>
+                    <td>/agents</td>
+                    <td>Lists all agents</td>
+                </tr>
+            </tbody></table>
+        </div>
+
+        <!-- Step 10: Systemd -->
+        <div class="step-card">
+            <div class="step-number">10</div>
+            <h2 class="step-title">Make It Run Forever (a.k.a. "The Immortality Step")</h2>
+            
+            <p>Right now, if you close your laptop, everything stops. Let's fix that with systemd - Ubuntu's built-in nanny that keeps things running.</p>
+            
+            <div class="analogy-box">
+                <h4>👶 What is systemd?</h4>
+                <p>Think of systemd as a digital nanny. You tell it "watch this process and make sure it stays running", and it does exactly that. Server reboots? systemd restarts your stuff. Crashes? systemd restarts it. It's the helicopter parent of process managers. <span class="catchphrase">Now you know.</span></p>
+            </div>
+            
+            <h3>Create the Service File</h3>
+            <p>First, stop any running gateway (Ctrl+C if it's running), then:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+sudo nano /etc/systemd/system/openclaw.service
+            </div>
+            
+            <p>Paste this exactly:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+[Unit]
+Description=OpenClaw AI Gateway
+After=network.target docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu
+ExecStart=/usr/local/bin/openclaw gateway --port 18789
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+            </div>
+            
+            <p>Save: Ctrl+X, then Y, then Enter.</p>
+            
+            <h3>Enable and Start</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+sudo systemctl daemon-reload
+sudo systemctl enable openclaw
+sudo systemctl start openclaw
+            </div>
+            
+            <h3>Check Everything</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+sudo systemctl status openclaw
+docker ps
+            </div>
+            
+            <div class="tip-box">
+                ✅ OpenClaw should show "active (running)" in green, and both containers should show "Up". Your system is now immortal! (Well, until the heat death of the universe, or Oracle changes their free tier policy, whichever comes first.)
+            </div>
+        </div>
+
+        <!-- Cheat Sheet -->
+        <div class="step-card">
+            <div class="step-number">📋</div>
+            <h2 class="step-title">Cheat Sheet (a.k.a. "The 'Oh Crap, What Was That Command Again?' Section")</h2>
+            
+            <table>
+                <tbody><tr>
+                    <th>Task</th>
+                    <th>Command</th>
+                </tr>
+                <tr>
+                    <td>Check OpenClaw status</td>
+                    <td><code>sudo systemctl status openclaw</code></td>
+                </tr>
+                <tr>
+                    <td>Restart OpenClaw</td>
+                    <td><code>sudo systemctl restart openclaw</code></td>
+                </tr>
+                <tr>
+                    <td>Watch live logs</td>
+                    <td><code>journalctl -u openclaw -f</code></td>
+                </tr>
+                <tr>
+                    <td>See containers</td>
+                    <td><code>docker ps</code></td>
+                </tr>
+                <tr>
+                    <td>Enter agent-alpha</td>
+                    <td><code>docker exec -it agent-alpha bash</code></td>
+                </tr>
+                <tr>
+                    <td>Restart agent-alpha</td>
+                    <td><code>docker restart agent-alpha</code></td>
+                </tr>
+                <tr>
+                    <td>View agent logs</td>
+                    <td><code>docker logs agent-alpha --tail 50</code></td>
+                </tr>
+                <tr>
+                    <td>List agents</td>
+                    <td><code>openclaw agents list</code></td>
+                </tr>
+                <tr>
+                    <td>Kill stuck gateway</td>
+                    <td><code>pkill -f 'openclaw gateway'</code></td>
+                </tr>
+            </tbody></table>
+        </div>
+
+        <!-- Troubleshooting -->
+        <div class="step-card">
+            <div class="step-number">🚑</div>
+            <h2 class="step-title">When Things Go Wrong (a.k.a. "The Panic Room")</h2>
+            
+            <h3>🔥 "Out of Capacity" Error</h3>
+            <p>ARM servers are popular. Try a different availability domain, or wait a few hours. Persistence!</p>
+            
+            <h3>🔥 "Permission denied (publickey)"</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+chmod 400 /path/to/your-key.key
+            </div>
+            
+            <h3>🔥 "Docker permission denied"</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+sudo usermod -aG docker $USER
+# Then log out and back in
+            </div>
+            
+            <h3>🔥 Locked yourself out with UFW</h3>
+            <p>Use Oracle's browser-based console (Cloud Shell) to access your server and fix the firewall. We've all been there.</p>
+            
+            <h3>🔥 Container shows "Exited"</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+docker logs agent-alpha --tail 30
+docker start agent-alpha
+            </div>
+        </div>
+
+        <!-- Final -->
+        <div class="step-card" style="text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <div class="step-number" style="background: white; color: var(--primary);">🎉</div>
+            <h2 class="step-title" style="color: white;">You Did It!</h2>
+            <p style="font-size: 1.2em; margin: 20px 0;">You now have a 24/7 AI automation server running completely free. Your Telegram bot is live, your agents are ready, and you didn't spend a dime.</p>
+            
+            <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 15px; margin: 20px 0;">
+                <p style="font-size: 1.3em; font-weight: 600; margin-bottom: 10px;">📱 @aiwithnaman</p>
+                <p style="font-size: 1.5em; font-style: italic;">Now You Know</p>
+                <p style="margin-top: 10px; opacity: 0.9;">Follow for more AI tutorials and automation tips!</p>
+            </div>
+            
+            <p style="font-size: 1.5em; margin-top: 30px;">🚀 Go forth and automate! 🤖</p>
+        </div>
+    </div>
+
+    <script>
+        // Progress bar
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progressBar").style.width = scrolled + "%";
+        };
+        
+        // Copy code function
+        function copyCode(btn) {
+            const codeBlock = btn.parentElement;
+            const code = codeBlock.innerText.replace('Copy', '').replace('Terminal', '').trim();
+            
+            navigator.clipboard.writeText(code).then(() => {
+                btn.textContent = 'Copied!';
+                btn.style.background = 'rgba(16, 185, 129, 0.3)';
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.style.background = 'rgba(255,255,255,0.1)';
+                }, 2000);
+            });
+        }
+        
+        // Checklist toggle
+        document.querySelectorAll('.checklist li').forEach(item => {
+            item.addEventListener('click', function() {
+                this.classList.toggle('checked');
+            });
+        });
+        
+        // Download as PDF function
+        function downloadPDF() {
+            window.print();
+        }
+    </script>
+
+</body></html>

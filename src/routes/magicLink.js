@@ -3,6 +3,17 @@ const crypto  = require('crypto');
 const db      = require('../db/setup');
 const { sendMagicLink } = require('../mail/mailer');
 
+const ALLOWED_ORIGINS = ['https://makoy.org', 'https://www.makoy.org'];
+
+function isSafeReturnUrl(url) {
+  try {
+    const parsed = new URL(url);
+    return ALLOWED_ORIGINS.some(o => parsed.origin === o);
+  } catch (_) {
+    return false;
+  }
+}
+
 module.exports = (limiter) => {
   const router = express.Router();
 
@@ -12,6 +23,9 @@ module.exports = (limiter) => {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ error: 'Invalid email' });
     }
+
+    const rawReturn  = (req.body.returnUrl || '').trim();
+    const returnUrl  = isSafeReturnUrl(rawReturn) ? rawReturn : null;
 
     // Already verified? Unlock immediately
     const already = db.prepare(
@@ -26,8 +40,8 @@ module.exports = (limiter) => {
     const token   = crypto.randomBytes(32).toString('hex');
     const expires = new Date(Date.now() + 30 * 60 * 1000).toISOString();
     db.prepare(
-      'INSERT INTO magic_tokens (email, token, expires_at) VALUES (?, ?, ?)'
-    ).run(email, token, expires);
+      'INSERT INTO magic_tokens (email, token, expires_at, return_url) VALUES (?, ?, ?, ?)'
+    ).run(email, token, expires, returnUrl);
 
     try {
       await sendMagicLink(email, token);
@@ -46,7 +60,7 @@ module.exports = (limiter) => {
     }
 
     const row = db.prepare(`
-      SELECT id, email FROM magic_tokens
+      SELECT id, email, return_url FROM magic_tokens
       WHERE token = ? AND email = ? AND used = 0
       AND datetime(expires_at) > datetime('now')
     `).get(token, email.toLowerCase().slice(0, 254));
@@ -63,9 +77,9 @@ module.exports = (limiter) => {
       'INSERT OR IGNORE INTO verified_emails (email) VALUES (?)'
     ).run(row.email);
 
-    res.redirect(
-      `${process.env.SITE_URL}?unlocked=1&email=${encodeURIComponent(row.email)}`
-    );
+    const base = row.return_url || process.env.SITE_URL;
+    const sep  = base.includes('?') ? '&' : '?';
+    res.redirect(`${base}${sep}unlocked=1&email=${encodeURIComponent(row.email)}`);
   });
 
   return router;

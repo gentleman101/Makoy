@@ -1,4 +1,5 @@
 const express = require('express');
+const db = require('../db/setup');
 const { sendConsultationAlert, sendConsultationConfirm } = require('../mail/mailer');
 
 module.exports = (limiter) => {
@@ -23,6 +24,11 @@ module.exports = (limiter) => {
     };
 
     try {
+      db.prepare(`
+        INSERT INTO consultations (first_name, last_name, email, company, size, challenge, message)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `).run(d.firstName, d.lastName, d.email, d.company, d.size, d.challenge, d.message);
+
       await sendConsultationAlert(d);
       sendConsultationConfirm(d).catch(e => console.error('Confirm mail error:', e.message));
       res.json({ success: true });

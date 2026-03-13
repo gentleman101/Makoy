@@ -26,6 +26,18 @@ db.exec(`
 
   CREATE INDEX IF NOT EXISTS idx_token ON magic_tokens(token);
   CREATE INDEX IF NOT EXISTS idx_email ON magic_tokens(email);
+
+  CREATE TABLE IF NOT EXISTS consultations (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name   TEXT NOT NULL,
+    last_name    TEXT,
+    email        TEXT NOT NULL,
+    company      TEXT,
+    size         TEXT,
+    challenge    TEXT,
+    message      TEXT,
+    submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 module.exports = db;

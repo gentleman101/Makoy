@@ -28,9 +28,4 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_email ON magic_tokens(email);
 `);
 
-// Add return_url column if it doesn't exist yet (safe on existing DBs)
-try {
-  db.exec('ALTER TABLE magic_tokens ADD COLUMN return_url TEXT');
-} catch (_) { /* column already exists */ }
-
 module.exports = db;

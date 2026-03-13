@@ -26,8 +26,9 @@ const emailBase = (content) => `
   </p>
 </div>`;
 
-async function sendMagicLink(email, token) {
-  const link = `${process.env.API_URL}/verify?token=${token}&email=${encodeURIComponent(email)}`;
+async function sendMagicLink(email, token, returnUrl) {
+  let link = `${process.env.API_URL}/verify?token=${token}&email=${encodeURIComponent(email)}`;
+  if (returnUrl) link += `&state=${encodeURIComponent(returnUrl)}`;
   await transporter.sendMail({
     from:    `"Katy from Makoy" <${process.env.SMTP_USER}>`,
     to:      email,

@@ -5,13 +5,9 @@ const { sendMagicLink } = require('../mail/mailer');
 
 const ALLOWED_ORIGINS = ['https://makoy.org', 'https://www.makoy.org'];
 
-function isSafeReturnUrl(url) {
-  try {
-    const parsed = new URL(url);
-    return ALLOWED_ORIGINS.some(o => parsed.origin === o);
-  } catch (_) {
-    return false;
-  }
+function isSameOrigin(url) {
+  try { return ALLOWED_ORIGINS.includes(new URL(url).origin); }
+  catch (_) { return false; }
 }
 
 module.exports = (limiter) => {
@@ -24,8 +20,8 @@ module.exports = (limiter) => {
       return res.status(400).json({ error: 'Invalid email' });
     }
 
-    const rawReturn  = (req.body.returnUrl || '').trim();
-    const returnUrl  = isSafeReturnUrl(rawReturn) ? rawReturn : null;
+    const rawReturn = (req.body.returnUrl || '').trim();
+    const returnUrl = isSameOrigin(rawReturn) ? rawReturn : null;
 
     // Already verified? Unlock immediately
     const already = db.prepare(
@@ -40,11 +36,11 @@ module.exports = (limiter) => {
     const token   = crypto.randomBytes(32).toString('hex');
     const expires = new Date(Date.now() + 30 * 60 * 1000).toISOString();
     db.prepare(
-      'INSERT INTO magic_tokens (email, token, expires_at, return_url) VALUES (?, ?, ?, ?)'
-    ).run(email, token, expires, returnUrl);
+      'INSERT INTO magic_tokens (email, token, expires_at) VALUES (?, ?, ?)'
+    ).run(email, token, expires);
 
     try {
-      await sendMagicLink(email, token);
+      await sendMagicLink(email, token, returnUrl);
       res.json({ success: true });
     } catch (err) {
       console.error('Mail error:', err.message);
@@ -54,30 +50,33 @@ module.exports = (limiter) => {
 
   // GET /verify?token=...&email=...
   router.get('/verify', (req, res) => {
-    const { token, email } = req.query;
+    const { token, email, state } = req.query;
     if (!token || !email) {
       return res.redirect(`${process.env.SITE_URL}?unlocked=error`);
     }
 
     const row = db.prepare(`
-      SELECT id, email, return_url FROM magic_tokens
+      SELECT id, email FROM magic_tokens
       WHERE token = ? AND email = ? AND used = 0
       AND datetime(expires_at) > datetime('now')
     `).get(token, email.toLowerCase().slice(0, 254));
 
     if (!row) {
-      return res.redirect(`${process.env.SITE_URL}?unlocked=error`);
+      const errBase = (state && isSameOrigin(state)) ? state : process.env.SITE_URL;
+      const sep = errBase.includes('?') ? '&' : '?';
+      return res.redirect(`${errBase}${sep}unlocked=error`);
     }
 
     // Mark token used
     db.prepare('UPDATE magic_tokens SET used = 1 WHERE id = ?').run(row.id);
 
-    // Store verified email (ignore if duplicate)
+    // Store verified email
     db.prepare(
       'INSERT OR IGNORE INTO verified_emails (email) VALUES (?)'
     ).run(row.email);
 
-    const base = row.return_url || process.env.SITE_URL;
+    // Redirect back to resource page (or homepage)
+    const base = (state && isSameOrigin(state)) ? state : process.env.SITE_URL;
     const sep  = base.includes('?') ? '&' : '?';
     res.redirect(`${base}${sep}unlocked=1&email=${encodeURIComponent(row.email)}`);
   });

@@ -1688,19 +1688,19 @@
             <span class="res-type-badge badge-template">📄 Template</span>
             <div class="res-title">Job Description Builder Framework</div>
             <div class="res-desc">A structured template for writing inclusive, clear JDs that attract the right talent.</div>
-            <a class="res-download" href="#" onclick="showToast('Resource coming soon — check back shortly!');return false;">Download <span>→</span></a>
+            <a class="res-download" href="#" data-resource="coming-soon" onclick="handleResourceClick(this);return false;">Download <span>→</span></a>
           </div>
           <div class="res-card">
             <span class="res-type-badge badge-checklist">✅ Checklist</span>
             <div class="res-title">Interview Bias Reduction Checklist</div>
             <div class="res-desc">20-point checklist to keep your hiring process fair and structured.</div>
-            <a class="res-download" href="#" onclick="showToast('Resource coming soon — check back shortly!');return false;">Download <span>→</span></a>
+            <a class="res-download" href="#" data-resource="coming-soon" onclick="handleResourceClick(this);return false;">Download <span>→</span></a>
           </div>
           <div class="res-card">
             <span class="res-type-badge badge-guide">📖 Guide</span>
             <div class="res-title">The Modern Recruiter's Playbook</div>
             <div class="res-desc">10-page guide to AI-assisted sourcing, screening, and selection in 2025.</div>
-            <a class="res-download" href="#" onclick="showToast('Resource coming soon — check back shortly!');return false;">Download <span>→</span></a>
+            <a class="res-download" href="#" data-resource="coming-soon" onclick="handleResourceClick(this);return false;">Download <span>→</span></a>
           </div>
         </div>
 
@@ -1710,19 +1710,19 @@
             <span class="res-type-badge badge-template">📄 Template</span>
             <div class="res-title">30-60-90 Day Onboarding Plan</div>
             <div class="res-desc">Editable milestone plan for managers and new hires to align expectations.</div>
-            <a class="res-download" href="#" onclick="showToast('Resource coming soon — check back shortly!');return false;">Download <span>→</span></a>
+            <a class="res-download" href="#" data-resource="coming-soon" onclick="handleResourceClick(this);return false;">Download <span>→</span></a>
           </div>
           <div class="res-card">
             <span class="res-type-badge badge-guide">📖 Guide</span>
             <div class="res-title">Building a Learning Culture</div>
             <div class="res-desc">How to design L&D programmes that employees actually engage with.</div>
-            <a class="res-download" href="#" onclick="showToast('Resource coming soon — check back shortly!');return false;">Download <span>→</span></a>
+            <a class="res-download" href="#" data-resource="coming-soon" onclick="handleResourceClick(this);return false;">Download <span>→</span></a>
           </div>
           <div class="res-card">
             <span class="res-type-badge badge-checklist">✅ Checklist</span>
             <div class="res-title">New Hire Week 1 Checklist</div>
             <div class="res-desc">Everything HR and the hiring manager need to ensure a smooth first week.</div>
-            <a class="res-download" href="#" onclick="showToast('Resource coming soon — check back shortly!');return false;">Download <span>→</span></a>
+            <a class="res-download" href="#" data-resource="coming-soon" onclick="handleResourceClick(this);return false;">Download <span>→</span></a>
           </div>
         </div>
 
@@ -1732,19 +1732,19 @@
             <span class="res-type-badge badge-template">📄 Template</span>
             <div class="res-title">Exit Interview Question Bank</div>
             <div class="res-desc">50 structured questions to uncover real reasons for attrition.</div>
-            <a class="res-download" href="#" onclick="showToast('Resource coming soon — check back shortly!');return false;">Download <span>→</span></a>
+            <a class="res-download" href="#" data-resource="coming-soon" onclick="handleResourceClick(this);return false;">Download <span>→</span></a>
           </div>
           <div class="res-card">
             <span class="res-type-badge badge-case">📊 Case Study</span>
             <div class="res-title">Reducing Turnover with Feedback Loops</div>
             <div class="res-desc">How one team reduced 6-month attrition by 34% through structured check-ins.</div>
-            <a class="res-download" href="#" onclick="showToast('Resource coming soon — check back shortly!');return false;">Read More <span>→</span></a>
+            <a class="res-download" href="#" data-resource="coming-soon" onclick="handleResourceClick(this);return false;">Read More <span>→</span></a>
           </div>
           <div class="res-card">
             <span class="res-type-badge badge-guide">📖 Guide</span>
             <div class="res-title">Employee Pulse Survey Design Guide</div>
             <div class="res-desc">Best practices for running surveys that surface honest, actionable feedback.</div>
-            <a class="res-download" href="#" onclick="showToast('Resource coming soon — check back shortly!');return false;">Download <span>→</span></a>
+            <a class="res-download" href="#" data-resource="coming-soon" onclick="handleResourceClick(this);return false;">Download <span>→</span></a>
           </div>
         </div>
 
@@ -2028,9 +2028,25 @@
   }
 
   function unlockResources() {
+    localStorage.setItem('makoy_unlocked', '1');
     document.getElementById('gate-overlay').style.display = 'none';
     document.getElementById('resources-preview').classList.add('unlocked');
     showToast('Resources unlocked — enjoy!');
+    const pending = localStorage.getItem('makoy_pending_resource');
+    if (pending) {
+      localStorage.removeItem('makoy_pending_resource');
+      window.open(pending, '_blank');
+    }
+  }
+
+  function handleResourceClick(el) {
+    const resource = el.dataset.resource;
+    if (!resource || resource === 'coming-soon') {
+      showToast('Resource coming soon — check back shortly!');
+    } else {
+      window.open(resource, '_blank');
+    }
+    return false;
   }
 
   async function resendLink() {
@@ -2108,18 +2124,20 @@
     }
   }
 
-  // ── Auto-unlock on load — detect ?unlocked=1 from magic link redirect ──
+  // ── Auto-unlock on load — magic link redirect OR persisted localStorage ──
   window.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('unlocked') === '1') {
       unlockResources();
-      // Clean the URL without reloading
       const clean = window.location.pathname + window.location.hash;
       window.history.replaceState(null, '', clean);
     } else if (params.get('unlocked') === 'error') {
       showToast('That link has expired or already been used. Please request a new one.', 'error');
       const clean = window.location.pathname + window.location.hash;
       window.history.replaceState(null, '', clean);
+    } else if (localStorage.getItem('makoy_unlocked') === '1') {
+      document.getElementById('gate-overlay').style.display = 'none';
+      document.getElementById('resources-preview').classList.add('unlocked');
     }
   });
 </script>
